@@ -1,555 +1,317 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Cookie File Converter</title>
-
-<style>
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:Segoe UI,sans-serif;
-}
-
-body{
-    background:linear-gradient(135deg,#141414,#292929);
-    color:white;
-    min-height:100vh;
-    padding:20px;
-}
-
-.container{
-    max-width:650px;
-    margin:auto;
-}
-
-.header{
-    text-align:center;
-    margin-bottom:25px;
-}
-
-.header h1{
-    color:#e50914;
-}
-
-.header p{
-    color:#aaa;
-    margin-top:8px;
-}
-
-
-.card{
-    background:#1f1f1f;
-    padding:22px;
-    border-radius:14px;
-    box-shadow:0 5px 20px #0008;
-}
-
-
-.formats{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:8px;
-    margin-bottom:20px;
-}
-
-
-.tag{
-    background:#333;
-    padding:10px;
-    text-align:center;
-    border-radius:6px;
-}
-
-
-.tag.active{
-    background:#e50914;
-}
-
-
-
-.upload{
-    border:2px dashed #555;
-    padding:25px;
-    text-align:center;
-    border-radius:10px;
-    cursor:pointer;
-}
-
-
-.upload:hover{
-    border-color:#e50914;
-}
-
-
-input[type=file]{
-    display:none;
-}
-
-
-textarea{
-
-    width:100%;
-    min-height:160px;
-    margin-top:10px;
-
-    background:#292929;
-    color:white;
-
-    border:1px solid #444;
-    border-radius:8px;
-
-    padding:12px;
-
-    font-family:monospace;
-}
-
-
-button{
-
-    width:100%;
-    margin-top:15px;
-
-    padding:14px;
-
-    background:#e50914;
-    color:white;
-
-    border:none;
-    border-radius:8px;
-
-    cursor:pointer;
-    font-size:16px;
-}
-
-
-button:hover{
-    background:#f40612;
-}
-
-
-
-.result{
-
-    margin-top:20px;
-    display:none;
-
-}
-
-
-.result.show{
-    display:block;
-}
-
-
-
-.box{
-
-    padding:15px;
-    border-radius:8px;
-    margin-bottom:10px;
-
-}
-
-
-
-.success{
-
-    background:#064e3b;
-    border:1px solid #10b981;
-
-}
-
-
-.error{
-
-    background:#450a0a;
-    border:1px solid #ef4444;
-
-}
-
-
-pre{
-
-    white-space:pre-wrap;
-    word-break:break-word;
-
-    background:#111;
-    padding:12px;
-
-    border-radius:8px;
-
-    font-size:12px;
-
-}
-
-
-</style>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netflix Cookie Converter</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body {
+            background: linear-gradient(135deg, #141414, #2d2d2d);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 650px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 25px; }
+        .header h1 { color: #e50914; font-size: 26px; margin-bottom: 5px; }
+        .header p { color: #999; font-size: 14px; }
+        .card {
+            background: #1f1f1f; border-radius: 12px; padding: 22px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+        .formats {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+            margin-bottom: 18px;
+        }
+        .format-tag {
+            background: #333; padding: 8px; border-radius: 6px;
+            text-align: center; font-size: 13px; border: 1px solid #444;
+        }
+        .format-tag.active { background: #e50914; border-color: #e50914; }
+        label { display: block; margin: 14px 0 6px; color: #ddd; font-weight: 500; }
+        textarea {
+            width: 100%; min-height: 110px; background: #2a2a2a;
+            border: 1px solid #444; border-radius: 8px; padding: 12px;
+            color: #fff; font-family: monospace; font-size: 13px;
+        }
+        textarea:focus { outline: none; border-color: #e50914; }
+        .upload-box {
+            border: 2px dashed #444; border-radius: 8px; padding: 22px;
+            text-align: center; cursor: pointer; margin: 10px 0;
+            transition: 0.2s;
+        }
+        .upload-box:hover, .upload-box.dragover { border-color: #e50914; background: rgba(229,9,20,0.05); }
+        input[type="file"] { display: none; }
+        .file-name { font-size: 13px; color: #888; margin-top: 5px; }
+        button {
+            width: 100%; padding: 14px; background: #e50914; color: #fff;
+            border: none; border-radius: 8px; font-size: 16px; font-weight: 600;
+            cursor: pointer; margin-top: 10px;
+        }
+        button:hover { background: #f40612; }
+        button:disabled { background: #444; cursor: not-allowed; }
+        .result { margin-top: 20px; display: none; }
+        .result.show { display: block; }
+        .success { background: rgba(16,185,129,0.1); border: 1px solid #10b981; border-radius: 8px; padding: 14px; margin-bottom: 15px; }
+        .error { background: rgba(239,68,68,0.1); border: 1px solid #ef4444; border-radius: 8px; padding: 14px; margin-bottom: 15px; }
+        .link-row {
+            background: #2a2a2a; border-radius: 6px; padding: 12px;
+            margin: 8px 0; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+        }
+        .link-label { font-weight: 600; min-width: 70px; }
+        .link-url { flex: 1; font-family: monospace; font-size: 11px; color: #aaa; word-break: break-all; }
+        .copy-btn {
+            padding: 5px 10px; background: #333; border: none;
+            border-radius: 4px; color: #fff; font-size: 12px; cursor: pointer;
+            width: auto; margin: 0;
+        }
+        .copy-btn:hover { background: #444; }
+        .email-info {
+            margin-top: 15px; padding: 12px; background: rgba(59,130,246,0.1);
+            border-radius: 6px; font-size: 13px; color: #93c5fd;
+        }
+    </style>
 </head>
-
-
 <body>
-
-
-<div class="container">
-
-
-<div class="header">
-
-<h1>📂 Cookie File Converter</h1>
-
-<p>Upload & Analisa Format File</p>
-
-</div>
-
-
-
-<div class="card">
-
-
-
-<div class="formats">
-
-<div class="tag" id="netscape">
-Netscape
-</div>
-
-<div class="tag" id="json">
-JSON
-</div>
-
-<div class="tag" id="raw">
-RAW
-</div>
-
-</div>
-
-
-
-
-<label class="upload">
-
-<div id="uploadText">
-📁 Klik atau Drop File
-</div>
-
-<input type="file" id="fileInput" accept=".txt,.json">
-
-</label>
-
-
-
-<p id="fileInfo">
-Belum ada file
-</p>
-
-
-
-
-<textarea 
-id="content"
-placeholder="Isi file akan muncul disini">
-</textarea>
-
-
-
-<button id="process">
-
-🔍 Analisa File
-
-</button>
-
-
-
-<div class="result" id="result">
-
-<div id="message"></div>
-
-<pre id="preview"></pre>
-
-</div>
-
-
-
-</div>
-
-
-</div>
-
-
-
-
-<script>
-
-
-const fileInput =
-document.getElementById("fileInput");
-
-
-const uploadText =
-document.getElementById("uploadText");
-
-
-const fileInfo =
-document.getElementById("fileInfo");
-
-
-const content =
-document.getElementById("content");
-
-
-const result =
-document.getElementById("result");
-
-
-const message =
-document.getElementById("message");
-
-
-const preview =
-document.getElementById("preview");
-
-
-
-const tags={
-
-netscape:
-document.getElementById("netscape"),
-
-json:
-document.getElementById("json"),
-
-raw:
-document.getElementById("raw")
-
-};
-
-
-
-let currentFile=null;
-
-
-
-function resetTags(){
-
-Object.values(tags)
-.forEach(x=>x.classList.remove("active"));
-
-}
-
-
-
-
-fileInput.onchange=e=>{
-
-const file=e.target.files[0];
-
-if(file)
-readFile(file);
-
-};
-
-
-
-
-
-function readFile(file){
-
-currentFile=file;
-
-
-fileInfo.innerHTML=
-`📄 ${file.name} (${(file.size/1024).toFixed(2)} KB)`;
-
-
-uploadText.innerHTML=
-"✅ "+file.name;
-
-
-
-const reader=new FileReader();
-
-
-reader.onload=e=>{
-
-content.value=e.target.result;
-
-detectFormat(e.target.result);
-
-};
-
-
-reader.readAsText(file);
-
-
-}
-
-
-
-
-
-content.oninput=()=>{
-
-detectFormat(content.value);
-
-};
-
-
-
-
-
-function detectFormat(text){
-
-
-resetTags();
-
-
-let format="Unknown";
-
-
-
-if(text.trim().startsWith("[") &&
-text.includes('"name"')){
-
-tags.json.classList.add("active");
-
-format="JSON";
-
-}
-
-
-else if(
-text.includes("\t")
-){
-
-tags.netscape.classList.add("active");
-
-format="Netscape";
-
-}
-
-
-else if(
-text.includes("=")
-){
-
-tags.raw.classList.add("active");
-
-format="RAW";
-
-}
-
-
-return format;
-
-}
-
-
-
-
-
-document
-.getElementById("process")
-.onclick=()=>{
-
-
-const text=
-content.value.trim();
-
-
-
-if(!text){
-
-showError(
-"File kosong"
-);
-
-return;
-
-}
-
-
-
-const format=
-detectFormat(text);
-
-
-
-let lines=
-text.split("\n").length;
-
-
-
-showSuccess(
-`
-Format : ${format}
-
-Jumlah baris :
-${lines}
-
-File :
-${currentFile?
-currentFile.name:
-"Paste manual"}
-
-`
-);
-
-
-
-preview.textContent=
-text.substring(0,3000);
-
-
-
-};
-
-
-
-
-
-function showSuccess(text){
-
-
-result.classList.add("show");
-
-
-message.innerHTML=
-`
-<div class="box success">
-${text.replace(/\n/g,"<br>")}
-</div>
-`;
-
-}
-
-
-
-
-
-function showError(text){
-
-
-result.classList.add("show");
-
-
-message.innerHTML=
-`
-<div class="box error">
-❌ ${text}
-</div>
-`;
-
-}
-
-
-
-</script>
-
-
+    <div class="container">
+        <div class="header">
+            <h1>🎬 Netflix Cookie Converter</h1>
+            <p>GraphQL API • Tanpa Proxy • 3 Link Login</p>
+        </div>
+
+        <div class="card">
+            <div class="formats">
+                <div class="format-tag" id="fmt-ns">Netscape</div>
+                <div class="format-tag" id="fmt-json">JSON</div>
+                <div class="format-tag" id="fmt-raw">Raw</div>
+            </div>
+
+            <label>📂 Upload File (.txt / .json)</label>
+            <div class="upload-box" id="uploadBox">
+                <p id="uploadText">Klik atau seret file ke sini</p>
+                <input type="file" id="fileInput" accept=".txt,.json">
+            </div>
+            <p class="file-name" id="fileInfo">— Belum ada file —</p>
+
+            <label>📝 Atau Paste Cookie Langsung</label>
+            <textarea id="cookieArea" placeholder="netflix.com	TRUE	/	TRUE	1807468653	NetflixId	ct=..."></textarea>
+
+            <button id="convertBtn">🔄 Konversi</button>
+
+            <div class="result" id="resultBox">
+                <div id="statusMsg"></div>
+                <div id="linkList"></div>
+                <div id="emailNote"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================================================
+        // ✅ API GRAPHQL — TANPA PROXY!
+        // ==================================================
+        const el = {
+            uploadBox: document.getElementById('uploadBox'),
+            fileInput: document.getElementById('fileInput'),
+            uploadText: document.getElementById('uploadText'),
+            fileInfo: document.getElementById('fileInfo'),
+            cookieArea: document.getElementById('cookieArea'),
+            convertBtn: document.getElementById('convertBtn'),
+            resultBox: document.getElementById('resultBox'),
+            statusMsg: document.getElementById('statusMsg'),
+            linkList: document.getElementById('linkList'),
+            emailNote: document.getElementById('emailNote'),
+            fmtNs: document.getElementById('fmt-ns'),
+            fmtJson: document.getElementById('fmt-json'),
+            fmtRaw: document.getElementById('fmt-raw')
+        };
+
+        let fileName = null;
+
+        // ==================================================
+        // 📂 BACA FILE
+        // ==================================================
+        el.uploadBox.addEventListener('click', () => el.fileInput.click());
+        el.uploadBox.addEventListener('dragover', e => { e.preventDefault(); el.uploadBox.classList.add('dragover'); });
+        el.uploadBox.addEventListener('dragleave', () => el.uploadBox.classList.remove('dragover'));
+        el.uploadBox.addEventListener('drop', e => {
+            e.preventDefault(); el.uploadBox.classList.remove('dragover');
+            if (e.dataTransfer.files[0]) bacaFile(e.dataTransfer.files[0]);
+        });
+        el.fileInput.addEventListener('change', e => {
+            if (e.target.files[0]) bacaFile(e.target.files[0]);
+        });
+
+        function bacaFile(file) {
+            fileName = file.name;
+            el.uploadText.textContent = '✅ ' + file.name;
+            el.fileInfo.textContent = `📄 ${file.name} (${(file.size/1024).toFixed(1)} KB)`;
+            const reader = new FileReader();
+            reader.onload = e => {
+                el.cookieArea.value = e.target.result;
+                deteksiFormat(el.cookieArea.value);
+            };
+            reader.readAsText(file);
+        }
+
+        // ==================================================
+        // 🔍 DETEKSI FORMAT
+        // ==================================================
+        function deteksiFormat(text) {
+            [el.fmtNs, el.fmtJson, el.fmtRaw].forEach(t => t.classList.remove('active'));
+            if (/^\s*\[/.test(text) && text.includes('"name"') && text.includes('"value"')) {
+                el.fmtJson.classList.add('active'); return 'JSON Array';
+            }
+            if (/^\.(netflix\.)?com/i.test(text) || /\tNetflixId\t/.test(text)) {
+                el.fmtNs.classList.add('active'); return 'Netscape TSV';
+            }
+            if (/NetflixId=[^;&\s]+/.test(text)) {
+                el.fmtRaw.classList.add('active'); return 'Raw String';
+            }
+            return 'Tidak dikenali';
+        }
+
+        el.cookieArea.addEventListener('input', () => deteksiFormat(el.cookieArea.value));
+
+        // ==================================================
+        // 🍪 EKSTRAK COOKIE
+        // ==================================================
+        function ekstrakCookie(text) {
+            const c = {};
+            try {
+                const arr = JSON.parse(text);
+                if (Array.isArray(arr)) arr.forEach(i => {
+                    if (i.name === 'NetflixId') c.NetflixId = decodeURIComponent(i.value);
+                    if (i.name === 'SecureNetflixId') c.SecureNetflixId = decodeURIComponent(i.value);
+                    if (i.name === 'nfvdid') c.nfvdid = decodeURIComponent(i.value);
+                });
+            } catch {}
+            text.split('\n').forEach(line => {
+                const p = line.trim().split('\t');
+                if (p.length >= 7) {
+                    if (p[5] === 'NetflixId') c.NetflixId = decodeURIComponent(p[6]);
+                    if (p[5] === 'SecureNetflixId') c.SecureNetflixId = decodeURIComponent(p[6]);
+                    if (p[5] === 'nfvdid') c.nfvdid = decodeURIComponent(p[6]);
+                }
+            });
+            const m1 = text.match(/NetflixId=([^;&\s]+)/);
+            const m2 = text.match(/SecureNetflixId=([^;&\s]+)/);
+            const m3 = text.match(/nfvdid=([^;&\s]+)/);
+            if (m1) c.NetflixId = decodeURIComponent(m1[1]);
+            if (m2) c.SecureNetflixId = decodeURIComponent(m2[1]);
+            if (m3) c.nfvdid = decodeURIComponent(m3[1]);
+            return c;
+        }
+
+        // ==================================================
+        // 🔗 BUAT 3 LINK
+        // ==================================================
+        function buatLink(token) {
+            return {
+                hp: `https://www.netflix.com/unsupported?nftoken=${token}`,
+                pc: `https://www.netflix.com/login?nftoken=${token}`,
+                tv: `https://www.netflix.com/tv8?nftoken=${token}`
+            };
+        }
+
+        // ==================================================
+        // 🚀 KONVERSI — GRAPHQL API
+        // ==================================================
+        el.convertBtn.addEventListener('click', async () => {
+            const text = el.cookieArea.value.trim();
+            if (!text) return tampilPesan('❌ Isi cookie terlebih dahulu!', false);
+            
+            const format = deteksiFormat(text);
+            const cookie = ekstrakCookie(text);
+
+            if (!cookie.NetflixId) 
+                return tampilPesan(`❌ NetflixId tidak ditemukan!\nFormat: ${format}`, false);
+
+            el.convertBtn.disabled = true;
+            el.convertBtn.textContent = '⏳ Memproses...';
+
+            try {
+                // ✅ GRAPHQL API — BISA LANGSUNG DARI BROWSER!
+                const cookieHeader = `NetflixId=${cookie.NetflixId}` + 
+                    (cookie.SecureNetflixId ? `; SecureNetflixId=${cookie.SecureNetflixId}` : '') +
+                    (cookie.nfvdid ? `; nfvdid=${cookie.nfvdid}` : '');
+
+                // Query GraphQL untuk dapatkan token login
+                const query = {
+                    operationName: "createAutoLoginToken",
+                    variables: {},
+                    query: `mutation createAutoLoginToken {
+                        createAutoLoginToken {
+                            token
+                            success
+                        }
+                    }`
+                };
+
+                const res = await fetch("https://www.netflix.com/api/graphql", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Cookie": cookieHeader,
+                        "Accept": "*/*"
+                    },
+                    body: JSON.stringify(query),
+                    credentials: "include"
+                });
+
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const data = await res.json();
+
+                // ✅ Ekstrak token
+                const token = data?.data?.createAutoLoginToken?.token;
+                if (!token) throw new Error("Token tidak ditemukan di respons");
+
+                const links = buatLink(token);
+                tampilHasil(cookie, format, token, links);
+
+            } catch (e) {
+                tampilPesan(`❌ ${e.message}\n\n⚠️ GraphQL juga butuh sesi aktif. Gunakan Python untuk hasil paling stabil!`, false);
+            }
+
+            el.convertBtn.disabled = false;
+            el.convertBtn.textContent = '🔄 Konversi';
+        });
+
+        // ==================================================
+        // 🖼️ TAMPILAN
+        // ==================================================
+        function tampilPesan(teks, sukses) {
+            el.statusMsg.innerHTML = `<div class="${sukses?'success':'error'}">${teks.replace(/\n/g,'<br>')}</div>`;
+            el.resultBox.classList.add('show');
+        }
+
+        function tampilHasil(cookie, format, token, links) {
+            el.statusMsg.innerHTML = `
+                <div class="success">
+                    ✅ <b>BERHASIL — GRAPHQL API!</b><br>
+                    📋 Format: ${format}<br>
+                    🍪 NetflixId: ✅ Terbaca<br>
+                    🔒 SecureNetflixId: ${cookie.SecureNetflixId ? '✅ ADA' : '⚠️ Tidak ada'}<br>
+                    🆔 nfvdid: ${cookie.nfvdid ? '✅ ADA' : '⚠️ Tidak ada'}<br>
+                    🔑 Token: <code>${token.substring(0,50)}...</code>
+                </div>`;
+            el.linkList.innerHTML = `
+                <div class="link-row">
+                    <span class="link-label">📱 HP</span>
+                    <span class="link-url">${links.hp}</span>
+                    <button class="copy-btn" onclick="navigator.clipboard.writeText('${links.hp}')">Salin</button>
+                </div>
+                <div class="link-row">
+                    <span class="link-label">💻 Laptop</span>
+                    <span class="link-url">${links.pc}</span>
+                    <button class="copy-btn" onclick="navigator.clipboard.writeText('${links.pc}')">Salin</button>
+                </div>
+                <div class="link-row">
+                    <span class="link-label">📺 TV</span>
+                    <span class="link-url">${links.tv}</span>
+                    <button class="copy-btn" onclick="navigator.clipboard.writeText('${links.tv}')">Salin</button>
+                </div>`;
+            el.resultBox.classList.add('show');
+        }
+    </script>
 </body>
 </html>
