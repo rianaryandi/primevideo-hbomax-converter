@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Prime Video Cookies Converter</title>
     <style>
         * {
@@ -12,13 +12,18 @@
             font-family: 'Segoe UI', sans-serif;
         }
 
+        html, body {
+            width: 100%;
+            overflow-x: hidden;
+        }
+
         body {
             background: linear-gradient(-45deg, #0A0A0A, #141E30, #0F2027, #203A43);
             background-size: 400% 400%;
             animation: gradientShift 15s ease infinite;
             color: #fff;
             min-height: 100vh;
-            padding: 20px;
+            padding: 15px;
             transition: all 0.4s ease;
         }
 
@@ -29,7 +34,8 @@
         }
 
         .container {
-            max-width: 750px;
+            width: 100%;
+            max-width: 720px;
             margin: 0 auto;
             animation: fadeInUp 0.8s ease-out;
         }
@@ -43,9 +49,10 @@
             text-align: center;
             color: #00A8E1;
             margin-bottom: 5px;
-            font-size: clamp(22px, 5vw, 28px);
+            font-size: clamp(20px, 6vw, 28px);
             font-weight: 700;
             transition: transform 0.3s ease;
+            word-wrap: break-word;
         }
 
         h1:hover { transform: scale(1.02); }
@@ -65,12 +72,13 @@
             color: #28a745;
             font-size: clamp(13px, 3vw, 15px);
             margin-bottom: 20px;
-            padding: 12px 18px;
+            padding: 12px 15px;
             background: rgba(40, 167, 69, 0.1);
             border-radius: 12px;
             border-left: 4px solid #28a745;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             animation: pulseGlow 2s ease-in-out infinite;
+            line-height: 1.5;
         }
 
         .detect-box:hover {
@@ -87,11 +95,12 @@
             background: rgba(26, 26, 26, 0.85);
             backdrop-filter: blur(10px);
             border-radius: 16px;
-            padding: clamp(20px, 5vw, 30px);
+            padding: 20px;
             margin-bottom: 20px;
             border: 1px solid rgba(51, 51, 51, 0.5);
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             animation: cardFloat 1s ease-out 0.3s both;
+            width: 100%;
         }
 
         @keyframes cardFloat {
@@ -116,11 +125,11 @@
 
         textarea {
             width: 100%;
-            min-height: 180px;
+            min-height: 150px;
             background: rgba(15, 15, 15, 0.8);
             border: 2px solid rgba(51, 51, 51, 0.6);
             color: #fff;
-            padding: 15px;
+            padding: 12px;
             border-radius: 12px;
             font-family: 'Consolas', 'Monaco', monospace;
             font-size: clamp(11px, 2.5vw, 13px);
@@ -139,7 +148,7 @@
 
         button {
             width: 100%;
-            padding: 15px;
+            padding: 14px;
             background: linear-gradient(90deg, #00A8E1, #0091C7);
             color: white;
             border: none;
@@ -183,17 +192,19 @@
             background: rgba(15, 15, 15, 0.9);
             border: 2px solid #00A8E1;
             border-radius: 12px;
-            padding: 18px;
+            padding: 15px;
             margin-top: 15px;
             font-family: 'Consolas', 'Monaco', monospace;
             font-size: clamp(10px, 2.5vw, 12px);
             line-height: 1.6;
-            max-height: 450px;
+            max-height: 350px;
             overflow-y: auto;
             white-space: pre;
             color: #d4d4d4;
             transition: all 0.3s ease;
             animation: slideIn 0.5s ease-out;
+            width: 100%;
+            word-break: break-all;
         }
 
         @keyframes slideIn {
@@ -203,19 +214,19 @@
 
         .stats {
             display: flex;
-            gap: 12px;
+            gap: 10px;
             margin-top: 15px;
             flex-wrap: wrap;
         }
 
         .stat {
             background: rgba(34, 34, 34, 0.8);
-            padding: 12px 16px;
+            padding: 10px 12px;
             border-radius: 10px;
             font-size: clamp(13px, 2.5vw, 15px);
             transition: all 0.3s ease;
             flex: 1;
-            min-width: 120px;
+            min-width: 110px;
             text-align: center;
         }
 
@@ -244,12 +255,13 @@
         .info {
             background: rgba(0, 168, 225, 0.08);
             border-left: 4px solid #00A8E1;
-            padding: 15px;
+            padding: 12px;
             margin-bottom: 20px;
             font-size: clamp(12px, 2.5vw, 14px);
             color: #aaa;
             border-radius: 0 10px 10px 0;
             transition: all 0.3s ease;
+            line-height: 1.6;
         }
 
         .info:hover {
@@ -260,11 +272,12 @@
         .upload-area {
             border: 2px dashed rgba(68, 68, 68, 0.8);
             border-radius: 12px;
-            padding: clamp(25px, 6vw, 35px);
+            padding: 25px 15px;
             text-align: center;
             margin-bottom: 15px;
             cursor: pointer;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            width: 100%;
         }
 
         .upload-area:hover, .upload-area.dragover {
@@ -273,32 +286,69 @@
             transform: scale(1.02);
         }
 
+        .upload-area p {
+            font-size: clamp(14px, 3vw, 16px);
+            line-height: 1.5;
+        }
+
         #fileInput { display: none; }
         .hidden { display: none !important; }
 
-        /* === RESPONSIVE === */
+        /* === RESPONSIVE HP — PERBAIKAN UTAMA === */
         @media (max-width: 480px) {
-            body { padding: 12px; }
-            .card { padding: 18px; }
-            .stats { flex-direction: column; }
-            .stat { width: 100%; }
-            textarea { min-height: 140px; }
+            body { 
+                padding: 10px; 
+            }
+            .container {
+                width: 100%;
+                padding: 0;
+            }
+            .card { 
+                padding: 16px; 
+                border-radius: 14px;
+            }
+            .stats { 
+                flex-direction: column; 
+            }
+            .stat { 
+                width: 100%; 
+            }
+            textarea { 
+                min-height: 130px; 
+                padding: 10px;
+            }
+            .detect-box {
+                padding: 10px;
+                font-size: 13px;
+            }
+            .upload-area {
+                padding: 20px 10px;
+            }
+            button {
+                padding: 12px;
+                font-size: 16px;
+            }
+            .result-box {
+                padding: 12px;
+                max-height: 300px;
+            }
         }
 
-        @media (min-width: 768px) {
-            .container { max-width: 700px; }
-            .stat { min-width: 140px; }
+        @media (min-width: 481px) and (max-width: 768px) {
+            body { padding: 20px; }
+            .card { padding: 24px; }
+            .container { max-width: 600px; }
         }
 
-        @media (min-width: 1024px) {
-            .container { max-width: 800px; }
+        @media (min-width: 769px) {
+            .container { max-width: 720px; }
             body { padding: 30px; }
         }
 
         /* Scrollbar */
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #1a1a1a; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb { background: #00A8E1; border-radius: 4px; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #1a1a1a; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb { background: #00A8E1; border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: #0091C7; }
     </style>
 </head>
@@ -346,7 +396,7 @@
         <!-- === FOOTER — POWERED BY XA - GDDO STORE === -->
         <footer style="
             text-align: center;
-            margin-top: 30px;
+            margin-top: 25px;
             padding: 20px;
             border-top: 1px solid rgba(255,255,255,0.1);
             animation: fadeIn 1.5s ease-out 0.5s both;
