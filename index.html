@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prime Video Converter — TSV ↔ JSON Format</title>
+    <title>Prime Video Cookies Converter</title>
     <style>
         * {
             margin: 0;
@@ -11,180 +11,310 @@
             box-sizing: border-box;
             font-family: 'Segoe UI', sans-serif;
         }
+
         body {
-            background: linear-gradient(135deg, #0A0A0A, #141E30);
+            background: linear-gradient(-45deg, #0A0A0A, #141E30, #0F2027, #203A43);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
             color: #fff;
             min-height: 100vh;
             padding: 20px;
+            transition: all 0.4s ease;
         }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
         .container {
             max-width: 750px;
             margin: 0 auto;
+            animation: fadeInUp 0.8s ease-out;
         }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         h1 {
             text-align: center;
             color: #00A8E1;
             margin-bottom: 5px;
-            font-size: 24px;
+            font-size: clamp(22px, 5vw, 28px);
+            font-weight: 700;
+            transition: transform 0.3s ease;
         }
+
+        h1:hover { transform: scale(1.02); }
+
         .subtitle {
             text-align: center;
             color: #888;
-            margin-bottom: 25px;
-            font-size: 14px;
-        }
-        .tabs {
-            display: flex;
-            gap: 10px;
             margin-bottom: 20px;
-            flex-wrap: wrap;
+            font-size: clamp(13px, 3vw, 15px);
+            animation: fadeIn 1s ease-out 0.2s both;
         }
-        .tab {
-            padding: 10px 18px;
-            background: #222;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            border: 2px solid transparent;
-            transition: 0.2s;
-        }
-        .tab.active {
-            background: #00A8E1;
-            border-color: #00A8E1;
-            color: #000;
-            font-weight: 600;
-        }
-        .card {
-            background: #1A1A1A;
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .detect-box {
+            text-align: center;
+            color: #28a745;
+            font-size: clamp(13px, 3vw, 15px);
+            margin-bottom: 20px;
+            padding: 12px 18px;
+            background: rgba(40, 167, 69, 0.1);
             border-radius: 12px;
-            padding: 25px;
-            margin-bottom: 20px;
-            border: 1px solid #333;
+            border-left: 4px solid #28a745;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: pulseGlow 2s ease-in-out infinite;
         }
+
+        .detect-box:hover {
+            transform: translateX(5px);
+            background: rgba(40, 167, 69, 0.15);
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 5px rgba(40, 167, 69, 0.2); }
+            50% { box-shadow: 0 0 20px rgba(40, 167, 69, 0.4); }
+        }
+
+        .card {
+            background: rgba(26, 26, 26, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: clamp(20px, 5vw, 30px);
+            margin-bottom: 20px;
+            border: 1px solid rgba(51, 51, 51, 0.5);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: cardFloat 1s ease-out 0.3s both;
+        }
+
+        @keyframes cardFloat {
+            from { opacity: 0; transform: translateY(20px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .card:hover {
+            border-color: rgba(0, 168, 225, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 168, 225, 0.1);
+            transform: translateY(-2px);
+        }
+
         label {
             display: block;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             font-weight: 600;
             color: #00A8E1;
+            font-size: clamp(14px, 3vw, 16px);
+            transition: color 0.3s ease;
         }
+
         textarea {
             width: 100%;
-            min-height: 200px;
-            background: #0F0F0F;
-            border: 1px solid #333;
+            min-height: 180px;
+            background: rgba(15, 15, 15, 0.8);
+            border: 2px solid rgba(51, 51, 51, 0.6);
             color: #fff;
             padding: 15px;
-            border-radius: 8px;
+            border-radius: 12px;
             font-family: 'Consolas', 'Monaco', monospace;
-            font-size: 12px;
-            line-height: 1.5;
+            font-size: clamp(11px, 2.5vw, 13px);
+            line-height: 1.6;
             resize: vertical;
             margin-bottom: 15px;
+            transition: all 0.3s ease;
         }
+
         textarea:focus {
             outline: none;
             border-color: #00A8E1;
+            box-shadow: 0 0 0 4px rgba(0, 168, 225, 0.15), 0 0 20px rgba(0, 168, 225, 0.2);
+            transform: translateY(-1px);
         }
+
         button {
             width: 100%;
-            padding: 14px;
+            padding: 15px;
             background: linear-gradient(90deg, #00A8E1, #0091C7);
             color: white;
             border: none;
-            border-radius: 8px;
-            font-size: 16px;
+            border-radius: 12px;
+            font-size: clamp(15px, 3vw, 17px);
             font-weight: 600;
             cursor: pointer;
-            transition: 0.3s;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             margin-bottom: 10px;
+            position: relative;
+            overflow: hidden;
         }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        button:hover::before { left: 100%; }
+
         button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(0, 168, 225, 0.3);
+            transform: translateY(-3px) scale(1.01);
+            box-shadow: 0 8px 25px rgba(0, 168, 225, 0.35);
         }
-        .btn-secondary {
-            background: #333;
-        }
+
+        button:active { transform: translateY(0) scale(0.98); }
+
+        .btn-secondary { background: linear-gradient(90deg, #333, #444); }
         .btn-secondary:hover {
-            background: #444;
-            transform: none;
-            box-shadow: none;
+            background: linear-gradient(90deg, #444, #555);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
+
         .result-box {
-            background: #0F0F0F;
-            border: 1px solid #00A8E1;
-            border-radius: 8px;
-            padding: 15px;
+            background: rgba(15, 15, 15, 0.9);
+            border: 2px solid #00A8E1;
+            border-radius: 12px;
+            padding: 18px;
             margin-top: 15px;
             font-family: 'Consolas', 'Monaco', monospace;
-            font-size: 11px;
-            line-height: 1.5;
+            font-size: clamp(10px, 2.5vw, 12px);
+            line-height: 1.6;
             max-height: 450px;
             overflow-y: auto;
             white-space: pre;
             color: #d4d4d4;
+            transition: all 0.3s ease;
+            animation: slideIn 0.5s ease-out;
         }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         .stats {
             display: flex;
-            gap: 15px;
+            gap: 12px;
             margin-top: 15px;
             flex-wrap: wrap;
         }
+
         .stat {
-            background: #222;
-            padding: 10px 15px;
-            border-radius: 6px;
-            font-size: 14px;
+            background: rgba(34, 34, 34, 0.8);
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: clamp(13px, 2.5vw, 15px);
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 120px;
+            text-align: center;
         }
+
+        .stat:hover {
+            transform: translateY(-2px);
+            background: rgba(0, 168, 225, 0.1);
+        }
+
         .stat span {
             font-weight: bold;
             color: #00A8E1;
+            font-size: 18px;
         }
+
         .copy-btn {
-            background: #28a745;
+            background: linear-gradient(90deg, #28a745, #20c997);
             margin-top: 15px;
-            padding: 12px;
-            font-size: 15px;
+            padding: 14px;
+            font-size: clamp(15px, 3vw, 16px);
         }
+
+        .copy-btn:hover {
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.35);
+        }
+
         .info {
-            background: rgba(0, 168, 225, 0.1);
-            border-left: 3px solid #00A8E1;
-            padding: 12px;
+            background: rgba(0, 168, 225, 0.08);
+            border-left: 4px solid #00A8E1;
+            padding: 15px;
             margin-bottom: 20px;
-            font-size: 13px;
+            font-size: clamp(12px, 2.5vw, 14px);
             color: #aaa;
+            border-radius: 0 10px 10px 0;
+            transition: all 0.3s ease;
         }
+
+        .info:hover {
+            background: rgba(0, 168, 225, 0.12);
+            transform: translateX(3px);
+        }
+
         .upload-area {
-            border: 2px dashed #444;
-            border-radius: 8px;
-            padding: 30px;
+            border: 2px dashed rgba(68, 68, 68, 0.8);
+            border-radius: 12px;
+            padding: clamp(25px, 6vw, 35px);
             text-align: center;
             margin-bottom: 15px;
             cursor: pointer;
-            transition: 0.3s;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
+
         .upload-area:hover, .upload-area.dragover {
             border-color: #00A8E1;
-            background: rgba(0, 168, 225, 0.05);
+            background: rgba(0, 168, 225, 0.08);
+            transform: scale(1.02);
         }
+
         #fileInput { display: none; }
         .hidden { display: none !important; }
+
+        /* === RESPONSIVE === */
+        @media (max-width: 480px) {
+            body { padding: 12px; }
+            .card { padding: 18px; }
+            .stats { flex-direction: column; }
+            .stat { width: 100%; }
+            textarea { min-height: 140px; }
+        }
+
+        @media (min-width: 768px) {
+            .container { max-width: 700px; }
+            .stat { min-width: 140px; }
+        }
+
+        @media (min-width: 1024px) {
+            .container { max-width: 800px; }
+            body { padding: 30px; }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #1a1a1a; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #00A8E1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #0091C7; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🎬 Prime Video Cookies Converter</h1>
-        <p class="subtitle">TSV ↔ JSON Array Format • Browser Extension</p>
+        <p class="subtitle">TSV ↔ JSON — Otomatis, tanpa pilih format!</p>
 
         <div class="info">
-            ✅ Input: Netscape TSV <b>ATAU</b> JSON Array<br>
-            ✅ Output: Format JSON sama persis seperti contoh di atas<br>
-            🔑 Otomatis: <code>x-main-av</code> • <code>ubid-main-av</code> • <code>at-main-av</code> • <code>session-id</code>
+            ✅ Upload file .txt format TSV → langsung jadi JSON<br>
+            ✅ Paste JSON → langsung jadi TSV<br>
+            🔑 Otomatis ekstrak semua cookie Prime Video
         </div>
 
-        <div class="tabs">
-            <div class="tab active" onclick="switchTab('json')">📤 → JSON Format</div>
-            <div class="tab" onclick="switchTab('tsv')">📥 → TSV Format</div>
+        <div class="detect-box" id="detectBox">
+            🔍 <b>Siap — upload atau paste cookies, otomatis terdeteksi!</b>
         </div>
 
         <div class="card">
@@ -195,69 +325,104 @@
                 <input type="file" id="fileInput" accept=".txt,.json">
             </div>
 
-            <textarea id="inputArea" placeholder="Paste cookies di sini — format TSV ATAU JSON Array didukung!"></textarea>
+            <textarea id="inputArea" placeholder="Paste cookies di sini — TSV atau JSON, otomatis terdeteksi!"></textarea>
 
-            <button id="btnConvert" onclick="convertToJSON()">🔄 KONVERSI → JSON FORMAT</button>
+            <button id="btnConvert" onclick="convertCookies()">🔄 KONVERSI</button>
             <button class="btn-secondary" onclick="clearAll()">🗑️ HAPUS SEMUA</button>
 
             <div class="stats" id="stats" style="display:none;">
-                <div class="stat">Total: <span id="totalCount">0</span> cookie</div>
-                <div class="stat">Akun: <span id="accountCount">0</span></div>
+                <div class="stat">Total<br><span id="totalCount">0</span> cookie</div>
+                <div class="stat">Akun<br><span id="accountCount">0</span></div>
             </div>
 
             <div id="resultContainer" class="hidden">
-                <label>✅ HASIL — JSON Format:</label>
+                <label>✅ HASIL:</label>
                 <div class="result-box" id="resultArea"></div>
                 <button class="copy-btn" onclick="copyResult()">📋 SALIN HASIL</button>
-                <button class="btn-secondary" onclick="downloadResult()" style="margin-top:10px;">💾 DOWNLOAD .JSON</button>
+                <button class="btn-secondary" onclick="downloadResult()" style="margin-top:10px;">💾 DOWNLOAD FILE</button>
             </div>
         </div>
+
+        <!-- === FOOTER — POWERED BY XA - GDDO STORE === -->
+        <footer style="
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            animation: fadeIn 1.5s ease-out 0.5s both;
+        ">
+            <a href="https://t.me/masgexo/" target="_blank" style="
+                color: #00A8E1;
+                text-decoration: none;
+                font-size: 15px;
+                font-weight: 600;
+                transition: all 0.3s ease;
+                display: inline-block;
+            " onmouseover="this.style.color='#fff';this.style.transform='scale(1.05)'"
+               onmouseout="this.style.color='#00A8E1';this.style.transform='scale(1)'">
+                ⚡ Powered By XA - GDDO STORE
+            </a>
+        </footer>
     </div>
 
     <script>
-        let currentMode = 'json';
+        let detectedMode = null;
         const uploadArea = document.getElementById('uploadArea');
         const fileInput = document.getElementById('fileInput');
         const inputArea = document.getElementById('inputArea');
+        const detectBox = document.getElementById('detectBox');
+        const btnConvert = document.getElementById('btnConvert');
 
-        // Tab Switch
-        function switchTab(mode) {
-            currentMode = mode;
-            document.querySelectorAll('.tab').forEach((t, i) => {
-                t.classList.toggle('active', (mode === 'json' && i === 0) || (mode === 'tsv' && i === 1));
-            });
-            document.getElementById('btnConvert').textContent = 
-                mode === 'json' ? '🔄 KONVERSI → JSON FORMAT' : '🔄 KONVERSI → TSV FORMAT';
-            document.querySelector('.copy-btn').textContent = '📋 SALIN HASIL';
-            document.querySelector('.btn-secondary:nth-of-type(2)').textContent = 
-                mode === 'json' ? '💾 DOWNLOAD .JSON' : '💾 DOWNLOAD .TXT';
+        function autoDetect(text) {
+            if (!text || !text.trim()) {
+                detectBox.innerHTML = '🔍 <b>Siap — upload atau paste cookies, otomatis terdeteksi!</b>';
+                detectBox.style.color = '#28a745';
+                detectedMode = null;
+                btnConvert.textContent = '🔄 KONVERSI';
+                return null;
+            }
+            
+            const trimmed = text.trimStart();
+            
+            if (trimmed.startsWith('[') || trimmed.startsWith('{')) {
+                detectedMode = 'json_input';
+                detectBox.innerHTML = '✅ <b>Terdeteksi: JSON Format</b> → akan dikonversi ke TSV';
+                detectBox.style.color = '#00A8E1';
+                btnConvert.textContent = '🔄 KONVERSI → TSV';
+            } else if (text.includes('\t') || text.includes('.primevideo.com')) {
+                detectedMode = 'tsv_input';
+                detectBox.innerHTML = '✅ <b>Terdeteksi: TSV Format</b> → akan dikonversi ke JSON';
+                detectBox.style.color = '#00A8E1';
+                btnConvert.textContent = '🔄 KONVERSI → JSON';
+            } else {
+                detectBox.innerHTML = '⚠️ <b>Format tidak dikenali</b> — coba paste ulang!';
+                detectBox.style.color = '#ffc107';
+                detectedMode = null;
+            }
+            return detectedMode;
         }
 
-        // File Upload
         uploadArea.addEventListener('click', () => fileInput.click());
-        uploadArea.addEventListener('dragover', e => {
-            e.preventDefault();
-            uploadArea.classList.add('dragover');
-        });
+        uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('dragover'); });
         uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
         uploadArea.addEventListener('drop', e => {
             e.preventDefault();
             uploadArea.classList.remove('dragover');
             if (e.dataTransfer.files) handleFile(e.dataTransfer.files[0]);
         });
-        fileInput.addEventListener('change', e => {
-            if (e.target.files[0]) handleFile(e.target.files[0]);
-        });
+        fileInput.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
 
         function handleFile(file) {
             const reader = new FileReader();
             reader.onload = e => {
                 inputArea.value = e.target.result;
+                autoDetect(inputArea.value);
             };
             reader.readAsText(file);
         }
 
-        // --- UTILS ---
+        inputArea.addEventListener('input', () => { autoDetect(inputArea.value); });
+
         function unquote(val) {
             if (!val) return val;
             val = val.trim();
@@ -267,15 +432,6 @@
             return val;
         }
 
-        function detectFormat(text) {
-            const trimmed = text.trimStart();
-            if (trimmed.startsWith('[')) return 'json';
-            if (trimmed.startsWith('{')) return 'json_single';
-            if (text.includes('\t') || text.includes('.primevideo.com')) return 'tsv';
-            return 'unknown';
-        }
-
-        // --- PARSE TSV → JSON ---
         function parseTSVtoJSON(text) {
             const lines = text.split('\n');
             const result = [];
@@ -313,14 +469,9 @@
             return result;
         }
 
-        // --- PARSE JSON → TSV ---
         function parseJSONtoTSV(text) {
             let data;
-            try {
-                data = JSON.parse(text);
-            } catch {
-                return null;
-            }
+            try { data = JSON.parse(text); } catch { return null; }
             if (!Array.isArray(data)) data = [data];
             
             const lines = [];
@@ -337,69 +488,46 @@
             return lines.join('\n');
         }
 
-        // --- MAIN CONVERT ---
-        function convertToJSON() {
+        function convertCookies() {
             const input = inputArea.value;
-            if (!input.trim()) {
-                alert('❌ Masukkan cookies terlebih dahulu!');
-                return;
-            }
+            if (!input.trim()) { alert('❌ Masukkan cookies terlebih dahulu!'); return; }
 
-            if (currentMode === 'json') {
-                // TSV → JSON
+            const mode = autoDetect(input);
+            if (!mode) { alert('❌ Format tidak dikenali! Pastikan TSV atau JSON.'); return; }
+
+            if (mode === 'tsv_input') {
                 const jsonResult = parseTSVtoJSON(input);
-                if (jsonResult.length === 0) {
-                    // Coba apakah sudah JSON → langsung format ulang
-                    try {
-                        const data = JSON.parse(input);
-                        const formatted = JSON.stringify(data, null, 4);
-                        document.getElementById('resultArea').textContent = formatted;
-                        document.getElementById('totalCount').textContent = Array.isArray(data) ? data.length : 1;
-                        document.getElementById('accountCount').textContent = '1';
-                    } catch {
-                        alert('❌ Tidak dapat membaca! Pastikan format TSV atau JSON benar.');
-                        return;
-                    }
-                } else {
-                    document.getElementById('resultArea').textContent = JSON.stringify(jsonResult, null, 4);
-                    document.getElementById('totalCount').textContent = jsonResult.length;
-                    // Hitung jumlah akun (berdasarkan x-main-av)
-                    const xmain = jsonResult.filter(c => c.name === 'x-main-av').length;
-                    document.getElementById('accountCount').textContent = xmain || '1+';
-                }
-                document.getElementById('resultContainer').classList.remove('hidden');
-                document.getElementById('stats').style.display = 'flex';
+                if (jsonResult.length === 0) { alert('❌ Tidak dapat membaca format TSV!'); return; }
+                document.getElementById('resultArea').textContent = JSON.stringify(jsonResult, null, 4);
+                document.getElementById('totalCount').textContent = jsonResult.length;
+                const xmain = jsonResult.filter(c => c.name.includes('x-main')).length;
+                document.getElementById('accountCount').textContent = xmain || '1+';
             } else {
-                // JSON → TSV
                 const tsvResult = parseJSONtoTSV(input);
-                if (!tsvResult) {
-                    alert('❌ Format JSON tidak valid!');
-                    return;
-                }
+                if (!tsvResult) { alert('❌ Format JSON tidak valid!'); return; }
                 document.getElementById('resultArea').textContent = tsvResult;
-                document.getElementById('resultContainer').classList.remove('hidden');
-                document.getElementById('stats').style.display = 'flex';
                 const lines = tsvResult.split('\n').filter(l => l.trim());
                 document.getElementById('totalCount').textContent = lines.length;
                 document.getElementById('accountCount').textContent = '1+';
             }
+
+            document.getElementById('resultContainer').classList.remove('hidden');
+            document.getElementById('stats').style.display = 'flex';
         }
 
         function copyResult() {
             const text = document.getElementById('resultArea').textContent;
-            navigator.clipboard.writeText(text).then(() => {
-                alert('✅ Berhasil disalin!');
-            });
+            navigator.clipboard.writeText(text).then(() => alert('✅ Berhasil disalin!'));
         }
 
         function downloadResult() {
             const text = document.getElementById('resultArea').textContent;
-            const blob = new Blob([text], { type: 'application/json' });
+            const isJSON = detectedMode === 'tsv_input';
+            const blob = new Blob([text], { type: isJSON ? 'application/json' : 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            const ext = currentMode === 'json' ? 'json' : 'txt';
-            a.download = `primevideo_cookies_${new Date().toISOString().slice(0,10)}.${ext}`;
+            a.download = `primevideo_${isJSON ? 'cookies' : 'tsv'}_${new Date().toISOString().slice(0,10)}.${isJSON ? 'json' : 'txt'}`;
             a.click();
             URL.revokeObjectURL(url);
         }
@@ -409,6 +537,7 @@
             document.getElementById('resultContainer').classList.add('hidden');
             document.getElementById('stats').style.display = 'none';
             fileInput.value = '';
+            autoDetect('');
         }
     </script>
 </body>
