@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prime Video Cookies Converter — TSV → Raw 1 Baris</title>
+    <title>Prime Video Converter — TSV ↔ JSON Format</title>
     <style>
         * {
             margin: 0;
@@ -18,20 +18,41 @@
             padding: 20px;
         }
         .container {
-            max-width: 700px;
+            max-width: 750px;
             margin: 0 auto;
         }
         h1 {
             text-align: center;
             color: #00A8E1;
             margin-bottom: 5px;
-            font-size: 26px;
+            font-size: 24px;
         }
         .subtitle {
             text-align: center;
             color: #888;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             font-size: 14px;
+        }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .tab {
+            padding: 10px 18px;
+            background: #222;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            border: 2px solid transparent;
+            transition: 0.2s;
+        }
+        .tab.active {
+            background: #00A8E1;
+            border-color: #00A8E1;
+            color: #000;
+            font-weight: 600;
         }
         .card {
             background: #1A1A1A;
@@ -48,14 +69,15 @@
         }
         textarea {
             width: 100%;
-            min-height: 180px;
+            min-height: 200px;
             background: #0F0F0F;
             border: 1px solid #333;
             color: #fff;
             padding: 15px;
             border-radius: 8px;
-            font-family: monospace;
-            font-size: 13px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 12px;
+            line-height: 1.5;
             resize: vertical;
             margin-bottom: 15px;
         }
@@ -94,13 +116,13 @@
             border-radius: 8px;
             padding: 15px;
             margin-top: 15px;
-            word-break: break-all;
-            font-family: monospace;
-            font-size: 12px;
-            line-height: 1.6;
-            max-height: 400px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 11px;
+            line-height: 1.5;
+            max-height: 450px;
             overflow-y: auto;
-            white-space: pre-wrap;
+            white-space: pre;
+            color: #d4d4d4;
         }
         .stats {
             display: flex;
@@ -121,8 +143,8 @@
         .copy-btn {
             background: #28a745;
             margin-top: 15px;
-            padding: 10px;
-            font-size: 14px;
+            padding: 12px;
+            font-size: 15px;
         }
         .info {
             background: rgba(0, 168, 225, 0.1);
@@ -146,209 +168,221 @@
             background: rgba(0, 168, 225, 0.05);
         }
         #fileInput { display: none; }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🎬 Prime Video Cookies Converter</h1>
-        <p class="subtitle">Format Netscape TSV → Raw 1 Baris</p>
+        <p class="subtitle">TSV ↔ JSON Array Format • Browser Extension</p>
 
         <div class="info">
-            ✅ Mendukung: Netscape TSV • JSON Array • Raw 1 Baris<br>
-            🔍 Otomatis ekstrak: <code>x-main</code> • <code>ubid-main</code> • <code>at-main</code> • <code>session-id</code>
+            ✅ Input: Netscape TSV <b>ATAU</b> JSON Array<br>
+            ✅ Output: Format JSON sama persis seperti contoh di atas<br>
+            🔑 Otomatis: <code>x-main-av</code> • <code>ubid-main-av</code> • <code>at-main-av</code> • <code>session-id</code>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('json')">📤 → JSON Format</div>
+            <div class="tab" onclick="switchTab('tsv')">📥 → TSV Format</div>
         </div>
 
         <div class="card">
             <label>📂 Upload File atau Paste Cookies di bawah:</label>
             
             <div class="upload-area" id="uploadArea">
-                <p>📤 Klik atau seret file .txt ke sini</p>
+                <p>📤 Klik atau seret file .txt / .json ke sini</p>
                 <input type="file" id="fileInput" accept=".txt,.json">
             </div>
 
-            <textarea id="inputArea" placeholder=".amazonaws.com	TRUE	/	FALSE	1899999999	x-main	...&#10;.primevideo.com	TRUE	/	FALSE	1899999999	ubid-main	..."></textarea>
+            <textarea id="inputArea" placeholder="Paste cookies di sini — format TSV ATAU JSON Array didukung!"></textarea>
 
-            <button onclick="convertCookies()">🔄 KONVERSI → 1 BARIS</button>
+            <button id="btnConvert" onclick="convertToJSON()">🔄 KONVERSI → JSON FORMAT</button>
             <button class="btn-secondary" onclick="clearAll()">🗑️ HAPUS SEMUA</button>
 
             <div class="stats" id="stats" style="display:none;">
-                <div class="stat">Total: <span id="totalCount">0</span> akun</div>
-                <div class="stat">Valid: <span id="validCount">0</span></div>
+                <div class="stat">Total: <span id="totalCount">0</span> cookie</div>
+                <div class="stat">Akun: <span id="accountCount">0</span></div>
             </div>
 
-            <div id="resultContainer" style="display:none;">
-                <label>✅ HASIL — Raw 1 Baris:</label>
+            <div id="resultContainer" class="hidden">
+                <label>✅ HASIL — JSON Format:</label>
                 <div class="result-box" id="resultArea"></div>
                 <button class="copy-btn" onclick="copyResult()">📋 SALIN HASIL</button>
-                <button class="btn-secondary" onclick="downloadResult()" style="margin-top:10px;">💾 DOWNLOAD .TXT</button>
+                <button class="btn-secondary" onclick="downloadResult()" style="margin-top:10px;">💾 DOWNLOAD .JSON</button>
             </div>
         </div>
     </div>
 
     <script>
+        let currentMode = 'json';
         const uploadArea = document.getElementById('uploadArea');
         const fileInput = document.getElementById('fileInput');
         const inputArea = document.getElementById('inputArea');
 
+        // Tab Switch
+        function switchTab(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.tab').forEach((t, i) => {
+                t.classList.toggle('active', (mode === 'json' && i === 0) || (mode === 'tsv' && i === 1));
+            });
+            document.getElementById('btnConvert').textContent = 
+                mode === 'json' ? '🔄 KONVERSI → JSON FORMAT' : '🔄 KONVERSI → TSV FORMAT';
+            document.querySelector('.copy-btn').textContent = '📋 SALIN HASIL';
+            document.querySelector('.btn-secondary:nth-of-type(2)').textContent = 
+                mode === 'json' ? '💾 DOWNLOAD .JSON' : '💾 DOWNLOAD .TXT';
+        }
+
+        // File Upload
         uploadArea.addEventListener('click', () => fileInput.click());
-        uploadArea.addEventListener('dragover', (e) => {
+        uploadArea.addEventListener('dragover', e => {
             e.preventDefault();
             uploadArea.classList.add('dragover');
         });
         uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
-        uploadArea.addEventListener('drop', (e) => {
+        uploadArea.addEventListener('drop', e => {
             e.preventDefault();
             uploadArea.classList.remove('dragover');
             if (e.dataTransfer.files) handleFile(e.dataTransfer.files[0]);
         });
-        fileInput.addEventListener('change', (e) => {
+        fileInput.addEventListener('change', e => {
             if (e.target.files[0]) handleFile(e.target.files[0]);
         });
 
         function handleFile(file) {
             const reader = new FileReader();
-            reader.onload = (e) => {
+            reader.onload = e => {
                 inputArea.value = e.target.result;
             };
             reader.readAsText(file);
         }
 
-        // Decode URL-encoded
-        function decodeValue(val) {
-            if (typeof val === 'string' && val.includes('%')) {
-                try { return decodeURIComponent(val); }
-                catch { return val; }
+        // --- UTILS ---
+        function unquote(val) {
+            if (!val) return val;
+            val = val.trim();
+            if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+                return val.slice(1, -1);
             }
             return val;
         }
 
-        // Ekstrak dari Netscape TSV
-        function parseNetscape(line) {
-            const parts = line.trim().split(/\t|\s+/);
-            if (parts.length >= 7 && (line.includes('.primevideo.com') || line.includes('.amazonaws.com') || line.includes('amazon'))) {
-                return { name: parts[5], value: decodeValue(parts[6]) };
-            }
-            return null;
+        function detectFormat(text) {
+            const trimmed = text.trimStart();
+            if (trimmed.startsWith('[')) return 'json';
+            if (trimmed.startsWith('{')) return 'json_single';
+            if (text.includes('\t') || text.includes('.primevideo.com')) return 'tsv';
+            return 'unknown';
         }
 
-        // Ekstrak 1 baris
-        function extractRaw1Line(text) {
-            const result = {};
-            const patterns = [
-                'x-main', 'ubid-main', 'at-main', 'session-id', 'csrf', 'i18n-prefs', 'sess-at-main'
-            ];
-            patterns.forEach(key => {
-                const regex = new RegExp(`${key}=([^;&\\s]+)`, 'gi');
-                const match = text.match(regex);
-                if (match) {
-                    const valMatch = text.match(new RegExp(`${key}=([^;&\\s]+)`, 'i'));
-                    if (valMatch) result[key] = decodeValue(valMatch[1]);
-                }
+        // --- PARSE TSV → JSON ---
+        function parseTSVtoJSON(text) {
+            const lines = text.split('\n');
+            const result = [];
+            const now = Date.now() / 1000;
+
+            lines.forEach(line => {
+                line = line.trim();
+                if (!line || line.startsWith('#')) return;
+                if (!line.includes('primevideo.com')) return;
+
+                let parts = line.split('\t');
+                if (parts.length < 5) parts = line.split(/\s+/);
+                if (parts.length < 7) return;
+
+                const domain = parts[0];
+                const secure = parts[3].toLowerCase() === 'true';
+                const expiry = parseFloat(parts[4]) || (now + 31536000);
+                const name = unquote(parts[5]);
+                const value = unquote(parts.slice(6).join(' '));
+
+                result.push({
+                    domain: domain,
+                    expirationDate: expiry,
+                    hostOnly: domain.startsWith('.'),
+                    httpOnly: false,
+                    name: name,
+                    path: '/',
+                    sameSite: null,
+                    secure: secure,
+                    session: false,
+                    storeId: null,
+                    value: value
+                });
             });
             return result;
         }
 
-        // Ekstrak dari JSON
-        function parseJSON(text) {
+        // --- PARSE JSON → TSV ---
+        function parseJSONtoTSV(text) {
+            let data;
             try {
-                const data = JSON.parse(text);
-                const cookies = Array.isArray(data) ? data : [data];
-                const result = {};
-                cookies.forEach(c => {
-                    if (c.name && c.value) {
-                        result[c.name] = decodeValue(c.value);
-                    }
-                });
-                return result;
+                data = JSON.parse(text);
             } catch {
                 return null;
             }
-        }
-
-        // Cek apakah ini blok 1 akun lengkap
-        function processAllCookies(text) {
-            const lines = text.split('\n');
-            const allAccounts = [];
-            let currentAccount = {};
+            if (!Array.isArray(data)) data = [data];
             
-            // Cek format 1 baris massal dulu
-            const singleLines = text.split('\n').filter(l => l.trim() && l.includes('x-main='));
-            if (singleLines.length > 0) {
-                singleLines.forEach(line => {
-                    const extracted = extractRaw1Line(line);
-                    if (Object.keys(extracted).length > 0) {
-                        allAccounts.push(extracted);
-                    }
-                });
-                return allAccounts;
-            }
-
-            // Proses per baris untuk format TSV
-            lines.forEach(line => {
-                line = line.trim();
-                if (!line || line.startsWith('#')) return;
-                
-                // Coba JSON
-                if (line.startsWith('[{') || line.startsWith('{')) {
-                    const jsonResult = parseJSON(line);
-                    if (jsonResult && Object.keys(jsonResult).length > 0) {
-                        allAccounts.push(jsonResult);
-                        return;
-                    }
-                }
-
-                // Coba Netscape
-                const ns = parseNetscape(line);
-                if (ns) {
-                    currentAccount[ns.name] = ns.value;
-                    // Kalau ketemu x-main = tanda awal akun baru
-                    if (ns.name === 'x-main' && Object.keys(currentAccount).length > 1) {
-                        allAccounts.push({...currentAccount});
-                        currentAccount = {};
-                    }
-                }
+            const lines = [];
+            data.forEach(c => {
+                const domain = c.domain || '.primevideo.com';
+                const flag = c.hostOnly ? 'TRUE' : 'FALSE';
+                const path = c.path || '/';
+                const secure = c.secure ? 'TRUE' : 'FALSE';
+                const expiry = c.expirationDate ? Math.floor(c.expirationDate) : 1899999999;
+                const name = c.name || '';
+                const value = c.value || '';
+                lines.push(`${domain}\t${flag}\t${path}\t${secure}\t${expiry}\t${name}\t${value}`);
             });
-
-            if (Object.keys(currentAccount).length > 0) {
-                allAccounts.push(currentAccount);
-            }
-
-            return allAccounts;
+            return lines.join('\n');
         }
 
-        // Ubah jadi 1 baris
-        function toRaw1Line(cookieObj) {
-            const keys = ['x-main', 'ubid-main', 'at-main', 'session-id', 'csrf'];
-            const parts = [];
-            keys.forEach(k => {
-                if (cookieObj[k]) parts.push(`${k}=${cookieObj[k]}`);
-            });
-            return parts.join(';');
-        }
-
-        function convertCookies() {
-            const input = inputArea.value.trim();
-            if (!input) {
+        // --- MAIN CONVERT ---
+        function convertToJSON() {
+            const input = inputArea.value;
+            if (!input.trim()) {
                 alert('❌ Masukkan cookies terlebih dahulu!');
                 return;
             }
 
-            const accounts = processAllCookies(input);
-            if (accounts.length === 0) {
-                alert('❌ Tidak dapat membaca format cookies! Pastikan format benar.');
-                return;
+            if (currentMode === 'json') {
+                // TSV → JSON
+                const jsonResult = parseTSVtoJSON(input);
+                if (jsonResult.length === 0) {
+                    // Coba apakah sudah JSON → langsung format ulang
+                    try {
+                        const data = JSON.parse(input);
+                        const formatted = JSON.stringify(data, null, 4);
+                        document.getElementById('resultArea').textContent = formatted;
+                        document.getElementById('totalCount').textContent = Array.isArray(data) ? data.length : 1;
+                        document.getElementById('accountCount').textContent = '1';
+                    } catch {
+                        alert('❌ Tidak dapat membaca! Pastikan format TSV atau JSON benar.');
+                        return;
+                    }
+                } else {
+                    document.getElementById('resultArea').textContent = JSON.stringify(jsonResult, null, 4);
+                    document.getElementById('totalCount').textContent = jsonResult.length;
+                    // Hitung jumlah akun (berdasarkan x-main-av)
+                    const xmain = jsonResult.filter(c => c.name === 'x-main-av').length;
+                    document.getElementById('accountCount').textContent = xmain || '1+';
+                }
+                document.getElementById('resultContainer').classList.remove('hidden');
+                document.getElementById('stats').style.display = 'flex';
+            } else {
+                // JSON → TSV
+                const tsvResult = parseJSONtoTSV(input);
+                if (!tsvResult) {
+                    alert('❌ Format JSON tidak valid!');
+                    return;
+                }
+                document.getElementById('resultArea').textContent = tsvResult;
+                document.getElementById('resultContainer').classList.remove('hidden');
+                document.getElementById('stats').style.display = 'flex';
+                const lines = tsvResult.split('\n').filter(l => l.trim());
+                document.getElementById('totalCount').textContent = lines.length;
+                document.getElementById('accountCount').textContent = '1+';
             }
-
-            const validAccounts = accounts.filter(acc => acc['x-main'] || acc['ubid-main']);
-            const outputLines = validAccounts.map(acc => toRaw1Line(acc));
-
-            // Tampilkan hasil
-            document.getElementById('totalCount').textContent = accounts.length;
-            document.getElementById('validCount').textContent = validAccounts.length;
-            document.getElementById('stats').style.display = 'flex';
-            
-            document.getElementById('resultArea').textContent = outputLines.join('\n');
-            document.getElementById('resultContainer').style.display = 'block';
         }
 
         function copyResult() {
@@ -360,18 +394,19 @@
 
         function downloadResult() {
             const text = document.getElementById('resultArea').textContent;
-            const blob = new Blob([text], { type: 'text/plain' });
+            const blob = new Blob([text], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `prime_raw_${new Date().toISOString().slice(0,10)}.txt`;
+            const ext = currentMode === 'json' ? 'json' : 'txt';
+            a.download = `primevideo_cookies_${new Date().toISOString().slice(0,10)}.${ext}`;
             a.click();
             URL.revokeObjectURL(url);
         }
 
         function clearAll() {
             inputArea.value = '';
-            document.getElementById('resultContainer').style.display = 'none';
+            document.getElementById('resultContainer').classList.add('hidden');
             document.getElementById('stats').style.display = 'none';
             fileInput.value = '';
         }
